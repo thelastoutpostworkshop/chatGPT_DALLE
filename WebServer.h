@@ -11,7 +11,7 @@
 WebServer server(80);
 
 // Web server host name
-const char *hostName = "ai_draw";
+const char *hostName = "dallee_round";
 
 const char* getCSS() {
     return 
