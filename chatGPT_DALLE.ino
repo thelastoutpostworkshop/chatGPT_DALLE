@@ -13,8 +13,8 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 TFT_eSPI tft = TFT_eSPI();
 
-uint8_t output[50000L];
-// uint8_t* output;
+// uint8_t output[50000L];
+uint8_t* output;
 
 void setup()
 {
@@ -26,12 +26,12 @@ void setup()
     // tft.setRotation(2);
     tft.fillScreen(TFT_WHITE);
 
-    // output = (uint8_t*) ps_malloc(50000L);
+    output = (uint8_t*) ps_malloc(500000L);
 
-    // if (output == NULL) {
-    //     Serial.println("Failed to allocate memory in PSRAM");
-    //     return;
-    // }
+    if (output == NULL) {
+        Serial.println("Failed to allocate memory in PSRAM");
+        return;
+    }
     
     size_t length = base64::decodeLength(mandalaBase64Png);
     base64::decode(mandalaBase64Png, output);
