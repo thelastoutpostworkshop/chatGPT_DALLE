@@ -5,7 +5,8 @@
 
 #include "mandalaBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 240 // Adjust for your images
+#define MAX_IMAGE_WIDTH 240             // Adjust for your images
+#define PSRAM_BUFFER_LENGTH 7000000L    // Memory allocation for buffer image in PSRAM
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -26,7 +27,9 @@ void setup()
     // tft.setRotation(2);
     tft.fillScreen(TFT_WHITE);
 
-    output = (uint8_t*) ps_malloc(500000L);
+    Serial.printf("PSRAM Size=%ld\n",ESP.getPsramSize());
+
+    output = (uint8_t*) ps_malloc(PSRAM_BUFFER_LENGTH);
 
     if (output == NULL) {
         Serial.println("Failed to allocate memory in PSRAM");
