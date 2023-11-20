@@ -35,6 +35,9 @@ void setup()
         Serial.println("Failed to allocate memory in PSRAM");
         return;
     }
+
+    String base64Image = fetchBase64Image("localhost",5500,"test.html");
+    Serial.println(base64Image);
     
     size_t length = base64::decodeLength(mandalaBase64Png);
     base64::decode(mandalaBase64Png, output);

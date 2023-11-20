@@ -328,6 +328,52 @@ void setupCommands(void)
         });
 }
 
+String fetchBase64Image(char *host, uint16_t port,char *page) {
+    WiFiClient client;
+
+
+    if (!client.connect(host, port)) {
+        Serial.printf("Connection failed, host=%s, port=%d\n",host,port);
+        return "";
+    }
+
+    // Send the HTTP request
+    client.printf("GET /%s HTTP/1.1\n\n",page);
+
+
+    // Wait for the server's response
+    while(!client.available()) {
+        delay(1000);
+    }
+
+    String line, base64Data = "";
+    bool isBase64DataStart = false;
+
+    // Read all lines of the reply
+    while(client.available()) {
+        line = client.readStringUntil('\r');
+        
+        // Look for the base64 encoded image in the HTML content
+        if (isBase64DataStart || line.indexOf("data:image/png;base64,") != -1) {
+            isBase64DataStart = true; // Marks the start of the base64 data
+            base64Data += line;
+        }
+    }
+
+    // Extract the base64 encoded data
+    int base64StartIndex = base64Data.indexOf("data:image/png;base64,");
+    if (base64StartIndex != -1) {
+        base64StartIndex += 22; // Length of "data:image/png;base64,"
+        int base64EndIndex = base64Data.indexOf("\"", base64StartIndex);
+        base64Data = base64Data.substring(base64StartIndex, base64EndIndex);
+    } else {
+        base64Data = "No base64 encoded image found";
+    }
+
+    client.stop();
+    return base64Data;
+}
+
 void initWebServer()
 {
     WiFi.mode(WIFI_STA);
