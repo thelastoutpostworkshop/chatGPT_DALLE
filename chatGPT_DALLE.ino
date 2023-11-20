@@ -36,10 +36,11 @@ void setup()
         return;
     }
 
-    String base64Image = fetchBase64Image("localhost",5500,"test.html");
+    String base64Image = fetchBase64Image("192.168.1.90",80,"test.html");
+    // String base64Image = fetchBase64Image("api.thingspeak.com",80,"");
     Serial.println(base64Image);
     
-    size_t length = base64::decodeLength(mandalaBase64Png);
+    size_t length = base64::decodeLength(base64Image.c_str());
     base64::decode(mandalaBase64Png, output);
 
     Serial.printf("base64 decoded length = %ld\n", length);

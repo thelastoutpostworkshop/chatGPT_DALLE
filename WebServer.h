@@ -13,9 +13,9 @@ WebServer server(80);
 // Web server host name
 const char *hostName = "dallee_round";
 
-const char* getCSS() {
-    return 
-"<style>\
+const char *getCSS()
+{
+    return "<style>\
                           .loading {\
                             background-color: #f3f3f3;\
                             cursor: not-allowed;\
@@ -92,65 +92,65 @@ const char* getCSS() {
                           </style>";
 };
 
-const char* getHTMLPageUpdate() {
-    return 
-"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
-    "<style>"
-    "body {"
-    "    font-size: 40px;" /* Change the size as needed */
-    "}"
-    "input[type=submit], input[type=file], #homeButton {"
-    "    font-size: 40px;"    /* Change the size as needed */
-    "    padding: 10px 20px;" /* Change the padding as needed */
-    "}"
-    "progress {"
-    "    width: 100%;"
-    "    height: 100px;" /* Increase the height as needed */
-    "}"
-    "#successMessage {"
-    "    display: none;" /* Initially hidden */
-    "    color: green;"
-    "}"
-    "</style>"
-    "<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
-    "<input type='file' name='update'>"
-    "<input type='submit' value='Update'>"
-    "</form>"
-    "<progress id='prg' value='0' max='100'></progress>"
-    "<div id='successMessage'>"
-    "Upload completed successfully!"
-    "<br>"
-    "<button id='homeButton' onclick='window.location=\"/\"'>Return to Home</button>"
-    "</div>"
-    "<script>"
-    "$('form').submit(function(e){"
-    "    e.preventDefault();"
-    "    var form = $('#upload_form')[0];"
-    "    var data = new FormData(form);"
-    "    $.ajax({"
-    "        url: '/upload',"
-    "        type: 'POST',"
-    "        data: data,"
-    "        contentType: false,"
-    "        processData:false,"
-    "        xhr: function() {"
-    "            var xhr = new window.XMLHttpRequest();"
-    "            xhr.upload.addEventListener('progress', function(evt) {"
-    "                if (evt.lengthComputable) {"
-    "                    var per = evt.loaded / evt.total;"
-    "                    $('#prg').val(Math.round(per*100));"
-    "                }"
-    "            }, false);"
-    "            return xhr;"
-    "        },"
-    "        success:function(d, s) {"
-    "            $('#successMessage').show();" // Show the success message and button
-    "        },"
-    "        error: function (a, b, c) {"
-    "        }"
-    "    });"
-    "});"
-    "</script>";
+const char *getHTMLPageUpdate()
+{
+    return "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
+           "<style>"
+           "body {"
+           "    font-size: 40px;" /* Change the size as needed */
+           "}"
+           "input[type=submit], input[type=file], #homeButton {"
+           "    font-size: 40px;"    /* Change the size as needed */
+           "    padding: 10px 20px;" /* Change the padding as needed */
+           "}"
+           "progress {"
+           "    width: 100%;"
+           "    height: 100px;" /* Increase the height as needed */
+           "}"
+           "#successMessage {"
+           "    display: none;" /* Initially hidden */
+           "    color: green;"
+           "}"
+           "</style>"
+           "<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
+           "<input type='file' name='update'>"
+           "<input type='submit' value='Update'>"
+           "</form>"
+           "<progress id='prg' value='0' max='100'></progress>"
+           "<div id='successMessage'>"
+           "Upload completed successfully!"
+           "<br>"
+           "<button id='homeButton' onclick='window.location=\"/\"'>Return to Home</button>"
+           "</div>"
+           "<script>"
+           "$('form').submit(function(e){"
+           "    e.preventDefault();"
+           "    var form = $('#upload_form')[0];"
+           "    var data = new FormData(form);"
+           "    $.ajax({"
+           "        url: '/upload',"
+           "        type: 'POST',"
+           "        data: data,"
+           "        contentType: false,"
+           "        processData:false,"
+           "        xhr: function() {"
+           "            var xhr = new window.XMLHttpRequest();"
+           "            xhr.upload.addEventListener('progress', function(evt) {"
+           "                if (evt.lengthComputable) {"
+           "                    var per = evt.loaded / evt.total;"
+           "                    $('#prg').val(Math.round(per*100));"
+           "                }"
+           "            }, false);"
+           "            return xhr;"
+           "        },"
+           "        success:function(d, s) {"
+           "            $('#successMessage').show();" // Show the success message and button
+           "        },"
+           "        error: function (a, b, c) {"
+           "        }"
+           "    });"
+           "});"
+           "</script>";
 }
 
 // Structure to store commands available on the web application
@@ -244,9 +244,7 @@ void handleHello(void)
                   "IP address: " + WiFi.localIP().toString() + "<br/>" +
                   "Connected to: " + String(ssid) + "<br/>" +
                   "ESP32 Temperature: " + String(static_cast<long>(temperatureRead())) + " C" +
-                  "</div>"
-                  + getCSS()
-                  + commandsList();
+                  "</div>" + getCSS() + commandsList();
     server.send(200, "text/html", body);
 }
 
@@ -328,33 +326,43 @@ void setupCommands(void)
         });
 }
 
-String fetchBase64Image(char *host, uint16_t port,char *page) {
+String fetchBase64Image(char *host, uint16_t port, char *page)
+{
     WiFiClient client;
 
-
-    if (!client.connect(host, port)) {
-        Serial.printf("Connection failed, host=%s, port=%d\n",host,port);
+    if (!client.connect(host, port))
+    {
+        Serial.printf("Connection failed, host=%s, port=%d\n", host, port);
         return "";
     }
 
     // Send the HTTP request
-    client.printf("GET /%s HTTP/1.1\n\n",page);
-
+    client.print("GET /test.html HTTP/1.1\n\n");
 
     // Wait for the server's response
-    while(!client.available()) {
-        delay(1000);
+    unsigned long timeout = millis();
+    while (client.available() == 0)
+    {
+        if (millis() - timeout > 5000)
+        {
+            Serial.println(">>> Client Timeout !");
+            client.stop();
+            return "";
+        }
     }
 
     String line, base64Data = "";
     bool isBase64DataStart = false;
 
     // Read all lines of the reply
-    while(client.available()) {
+    while (client.available())
+    {
         line = client.readStringUntil('\r');
-        
+        // Serial.println(line);
+
         // Look for the base64 encoded image in the HTML content
-        if (isBase64DataStart || line.indexOf("data:image/png;base64,") != -1) {
+        if (isBase64DataStart || line.indexOf("data:image/png;base64,") != -1)
+        {
             isBase64DataStart = true; // Marks the start of the base64 data
             base64Data += line;
         }
@@ -362,11 +370,14 @@ String fetchBase64Image(char *host, uint16_t port,char *page) {
 
     // Extract the base64 encoded data
     int base64StartIndex = base64Data.indexOf("data:image/png;base64,");
-    if (base64StartIndex != -1) {
+    if (base64StartIndex != -1)
+    {
         base64StartIndex += 22; // Length of "data:image/png;base64,"
         int base64EndIndex = base64Data.indexOf("\"", base64StartIndex);
         base64Data = base64Data.substring(base64StartIndex, base64EndIndex);
-    } else {
+    }
+    else
+    {
         base64Data = "No base64 encoded image found";
     }
 
