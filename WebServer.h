@@ -326,7 +326,7 @@ void setupCommands(void)
         });
 }
 
-const char *fetchBase64Image(char *host, uint16_t port, char *page)
+const char *fetchBase64Image(char *host, uint16_t port, unsigned int Base64DataBufferLength)
 {
     WiFiClient client;
 
@@ -355,7 +355,7 @@ const char *fetchBase64Image(char *host, uint16_t port, char *page)
     String base64Data;
     if (psramFound())
     {
-        base64Data.reserve(10000); // Reserve large size to reduce reallocations
+        base64Data.reserve(Base64DataBufferLength); // Reserve large size to reduce reallocations
     }
 
     // Flags to indicate the status of base64 data reading

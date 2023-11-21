@@ -6,8 +6,9 @@
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 1024         // Adjust for your images
-#define PSRAM_BUFFER_LENGTH 7000000L // Memory allocation for buffer image in PSRAM
+#define MAX_IMAGE_WIDTH 1024                // Adjust for your images
+#define PSRAM_BUFFER_LENGTH 5000000L        // Memory allocation for buffer image in PSRAM
+#define PSRAM_BUFFER_READ_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -31,14 +32,13 @@ void setup()
     Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
 
     output = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
-
     if (output == NULL)
     {
-        Serial.println("Failed to allocate memory in PSRAM");
+        Serial.println("Failed to allocate memory in PSRAM for image Buffer");
         return;
     }
 
-    const char *base64Image = fetchBase64Image("192.168.1.90", 80, "test.html");
+    const char *base64Image = fetchBase64Image("192.168.1.90", 80, PSRAM_BUFFER_READ_LENGTH);
     Serial.println(base64Image);
 
     size_t length = base64::decodeLength(base64Image);
