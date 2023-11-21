@@ -376,7 +376,6 @@ void fetchBase64Image(char *host, uint16_t port, String *base64Data)
                 char *endOfData = strchr(startOfData, '\"');
                 if (endOfData)
                 {
-                    Serial.println("End of Data in the same Buffer");
                     *endOfData = '\0'; // Replace the quote with a null terminator
                     *base64Data += startOfData;
                     base64EndFound = true;
@@ -392,7 +391,6 @@ void fetchBase64Image(char *host, uint16_t port, String *base64Data)
             char *endOfData = strstr(buffer, "\">");
             if (endOfData)
             {
-                Serial.println("End of Data in a different Buffer");
                 *endOfData = '\0'; // Replace the quote with a null terminator
                 *base64Data += buffer;
                 base64EndFound = true;

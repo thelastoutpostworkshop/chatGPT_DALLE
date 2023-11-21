@@ -6,9 +6,9 @@
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 1024                // Adjust for your images
-#define PSRAM_BUFFER_LENGTH 4000000L        // Memory allocation for buffer base64 data decoding in PSRAM
-#define PSRAM_BUFFER_READ_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data in PSRAM
+#define MAX_IMAGE_WIDTH 1024              // Adjust for your images
+#define PSRAM_BUFFER_LENGTH 4000000L      // Memory allocation for buffer base64 data decoding in PSRAM
+#define PSRAM_BUFFER_READ_LENGTH 2000000L // Memory allocation for reading the base64 encoded data in PSRAM
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -17,8 +17,8 @@ PNG png; // PNG decoder instance
 TFT_eSPI tft = TFT_eSPI();
 
 // uint8_t output[50000L];
-String base64Data;                 // String buffer for base64 encoded Data
-uint8_t *decodedBase64Data;        // Buffer to decode base64 data
+String base64Data;          // String buffer for base64 encoded Data
+uint8_t *decodedBase64Data; // Buffer to decode base64 data
 
 void setup()
 {
@@ -30,22 +30,31 @@ void setup()
     // tft.setRotation(2);
     tft.fillScreen(TFT_WHITE);
 
-    Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
-
-    decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
-    if (decodedBase64Data == NULL)
-    {
-        Serial.println("Failed to allocate memory in PSRAM for image Buffer");
-        return;
-    }
-
     if (psramFound())
     {
-        base64Data.reserve(PSRAM_BUFFER_READ_LENGTH); 
+
+        Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
+
+        decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
+        if (decodedBase64Data == NULL)
+        {
+            Serial.println("Failed to allocate memory in PSRAM for image Buffer");
+            return;
+        }
+
+        if (!base64Data.reserve(PSRAM_BUFFER_READ_LENGTH))
+        {
+            Serial.println("Reserve memory failed");
+            return;
+        }
+    }
+    else
+    {
+        Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
     }
 
     fetchBase64Image("192.168.1.90", 80, &base64Data);
-    Serial.printf("Size of encoded data = %u\n",strlen(base64Data.c_str()));
+    Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
 
     size_t length = base64::decodeLength(base64Data.c_str());
     base64::decode(base64Data.c_str(), decodedBase64Data);
