@@ -358,7 +358,7 @@ const char* fetchBase64Image(char *host, uint16_t port, char *page)
     while (client.available())
     {
         line = client.readStringUntil('\r');
-        // Serial.println(line);
+        Serial.println(line);
 
         // Look for the base64 encoded image in the HTML content
         if (isBase64DataStart || line.indexOf("data:image/png;base64,") != -1)
