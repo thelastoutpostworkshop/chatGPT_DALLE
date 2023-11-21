@@ -8,8 +8,9 @@
 #include "rainbowBase64Png.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
-#define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Memory allocation for buffer base64 data decoding in PSRAM
-#define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Memory allocation for reading the base64 encoded data in PSRAM
+#define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
+#define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Length of buffer for reading the base64 encoded data in PSRAM
+#define BUFFER_RESPONSE_LENGTH 1024               // Length of buffer for reading api response in chunks
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -64,7 +65,7 @@ void setup()
 
     // displayPngFromRam(decodedBase64Data, length);
 
-    callOpenAIAPIDalle(base64Data);
+    callOpenAIAPIDalle(&base64Data);
     Serial.println(base64Data);
 }
 
@@ -73,9 +74,9 @@ void loop()
     delay(1);
 }
 
-void callOpenAIAPIDalle(String readBuffer)
+void callOpenAIAPIDalle(String *readBuffer)
 {
-    readBuffer = ""; // Clear the buffer
+    *readBuffer = ""; // Clear the buffer
 
     WiFiClientSecure client;
     client.setInsecure(); // Only for demonstration, use a proper certificate validation in production
@@ -111,16 +112,16 @@ void callOpenAIAPIDalle(String readBuffer)
       }
     }
     // Buffer for reading data in chunks
-    int bufferLength = 1024;
+    int bufferLength = BUFFER_RESPONSE_LENGTH;
     char buffer[bufferLength];
     while (client.available())
     {
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
         buffer[bufferLength] = '\0'; // Null-terminate the buffer
-        readBuffer += buffer;
+        *readBuffer += buffer;
         Serial.printf("Buffer read size=%u\n", bufferLength);
-        Serial.println(buffer);
-        if(bufferLength < 1023) {
+        // Serial.println(buffer);
+        if(bufferLength < BUFFER_RESPONSE_LENGTH-1) {
             break;
         }
     }
