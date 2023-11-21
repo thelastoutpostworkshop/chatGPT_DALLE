@@ -7,7 +7,7 @@
 #include "rainbowBase64Png.h"
 
 #define MAX_IMAGE_WIDTH 1024                // Adjust for your images
-#define PSRAM_BUFFER_LENGTH 5000000L        // Memory allocation for buffer image in PSRAM
+#define PSRAM_BUFFER_LENGTH 4000000L        // Memory allocation for buffer image in PSRAM
 #define PSRAM_BUFFER_READ_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data
 
 int16_t xpos = 0;
@@ -39,7 +39,7 @@ void setup()
     }
 
     const char *base64Image = fetchBase64Image("192.168.1.90", 80, PSRAM_BUFFER_READ_LENGTH);
-    Serial.println(base64Image);
+    Serial.printf("Size of encoded data = %u\n",strlen(base64Image));
 
     size_t length = base64::decodeLength(base64Image);
     base64::decode(base64Image, output);
