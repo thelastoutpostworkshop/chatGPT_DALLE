@@ -90,7 +90,7 @@ void callOpenAIAPIDalle(String *readBuffer)
         return;
     }
 
-    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"A cute baby sea otter\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
+    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"a star wars ship flyinh through stars\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
 
     String request = "POST /v1/images/generations HTTP/1.1\r\n";
     request += "Host: " + String(host) + "\r\n";
@@ -104,27 +104,68 @@ void callOpenAIAPIDalle(String *readBuffer)
 
     Serial.println("Request sent");
 
-    while (client.connected()) {
-      String line = client.readStringUntil('\n');
-      if (line == "\r") {
-        Serial.println("headers received");
-        break;
-      }
-    }
-    // Buffer for reading data in chunks
-    int bufferLength = BUFFER_RESPONSE_LENGTH;
-    char buffer[bufferLength];
-    while (client.available())
+    while (client.connected())
     {
-        bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
-        buffer[bufferLength] = '\0'; // Null-terminate the buffer
-        *readBuffer += buffer;
-        Serial.printf("Buffer read size=%u\n", bufferLength);
-        // Serial.println(buffer);
-        if(bufferLength < BUFFER_RESPONSE_LENGTH-1) {
+        String line = client.readStringUntil('\n');
+        if (line == "\r")
+        {
+            Serial.println("headers received");
             break;
         }
     }
+
+    // Read the response in chunks
+    int bufferLength = BUFFER_RESPONSE_LENGTH;
+    char buffer[bufferLength];
+    char *startToken = "\"b64_json\": \"";
+    bool base64StartFound = false, base64EndFound = false;
+
+    // Read and process the response in chunks
+    while (client.available() && !base64EndFound)
+    {
+        bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
+        buffer[bufferLength] = '\0'; // Null-terminate the buffer
+
+        if (!base64StartFound)
+        {
+            char *base64Start = strstr(buffer, startToken);
+            if (base64Start)
+            {
+                Serial.println("base64StartFound");
+                base64StartFound = true;
+                char *startOfData = base64Start + strlen(startToken); // Skip "base64,"
+
+                // Check if the end of base64 data is in the same buffer
+                char *endOfData = strchr(startOfData, '\"');
+                if (endOfData)
+                {
+                    Serial.println("endOfData");
+                    *endOfData = '\0'; // Replace the quote with a null terminator
+                    *readBuffer += startOfData;
+                    base64EndFound = true;
+                }
+                else
+                {
+                    *readBuffer += startOfData;
+                }
+            }
+        }
+        else
+        {
+            char *endOfData = strstr(buffer, "\">");
+            if (endOfData)
+            {
+                *endOfData = '\0'; // Replace the quote with a null terminator
+                *readBuffer += buffer;
+                base64EndFound = true;
+            }
+            else
+            {
+                *readBuffer += buffer;
+            }
+        }
+    }
+
     client.stop();
     Serial.println("Request call completed");
 }
