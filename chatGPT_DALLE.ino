@@ -1,14 +1,15 @@
 #include <PNGdec.h>
 #include <TFT_eSPI.h>
 #include "WebServer.h"
+#include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
 
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 1024                        // Adjust for your images
-#define PSRAM_BUFFER_DECODED_LENGTH 4000000L        // Memory allocation for buffer base64 data decoding in PSRAM
-#define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data in PSRAM
+#define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
+#define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Memory allocation for buffer base64 data decoding in PSRAM
+#define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Memory allocation for reading the base64 encoded data in PSRAM
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -53,22 +54,65 @@ void setup()
         Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
     }
 
-    fetchBase64Image("192.168.1.90", 80, &base64Data);
-    Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
+    // fetchBase64Image("192.168.1.90", 80, &base64Data);
+    // Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
 
-    size_t length = base64::decodeLength(base64Data.c_str());
-    base64::decode(base64Data.c_str(), decodedBase64Data);
+    // size_t length = base64::decodeLength(base64Data.c_str());
+    // base64::decode(base64Data.c_str(), decodedBase64Data);
 
-    Serial.printf("base64 decoded length = %ld\n", length);
+    // Serial.printf("base64 decoded length = %ld\n", length);
 
-    // displayPngFromRam(panda,sizeof(panda));
-    displayPngFromRam(decodedBase64Data, length);
-    // Serial.println((const char *)output);
+    // displayPngFromRam(decodedBase64Data, length);
+
+    callOpenAIAPIDalle(base64Data);
 }
 
 void loop()
 {
     delay(1);
+}
+
+void callOpenAIAPIDalle(String readBuffer)
+{
+    readBuffer = ""; // Clear the buffer
+
+    WiFiClientSecure client;
+    client.setInsecure(); // Only for demonstration, use a proper certificate validation in production
+
+    const char *host = "api.openai.com";
+    const int httpsPort = 443;
+
+    if (!client.connect(host, httpsPort))
+    {
+        Serial.println("Connection failed");
+        return;
+    }
+
+    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"A cute baby sea otter\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
+
+    String request = "POST /v1/images/generations HTTP/1.1\r\n";
+    request += "Host: " + String(host) + "\r\n";
+    request += "Content-Type: application/json\r\n";
+    request += "Authorization: Bearer " + String(chatGPT_APIKey) + "\r\n";
+    request += "Content-Length: " + String(jsonPayload.length()) + "\r\n";
+    request += "Connection: close\r\n\r\n";
+    request += jsonPayload;
+
+    client.print(request);
+
+    Serial.println("Request sent");
+
+    // Buffer for reading data in chunks
+    int bufferLength = 1024;
+    char buffer[bufferLength];
+    while (client.connected() && bufferLength == 1024)
+    {
+        bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
+        buffer[bufferLength] = '\0'; // Null-terminate the buffer
+        readBuffer += buffer;
+    }
+
+    Serial.println("Request call completed");
 }
 
 void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
