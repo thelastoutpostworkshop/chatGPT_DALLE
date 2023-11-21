@@ -6,9 +6,9 @@
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 1024              // Adjust for your images
-#define PSRAM_BUFFER_LENGTH 4000000L      // Memory allocation for buffer base64 data decoding in PSRAM
-#define PSRAM_BUFFER_READ_LENGTH 2000000L // Memory allocation for reading the base64 encoded data in PSRAM
+#define MAX_IMAGE_WIDTH 1024                        // Adjust for your images
+#define PSRAM_BUFFER_DECODED_LENGTH 4000000L        // Memory allocation for buffer base64 data decoding in PSRAM
+#define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data in PSRAM
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -28,21 +28,21 @@ void setup()
 
     tft.begin();
     // tft.setRotation(2);
-    tft.fillScreen(TFT_WHITE);
+    tft.fillScreen(TFT_BLACK);
 
     if (psramFound())
     {
 
         Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
 
-        decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
+        decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_DECODED_LENGTH);
         if (decodedBase64Data == NULL)
         {
             Serial.println("Failed to allocate memory in PSRAM for image Buffer");
             return;
         }
 
-        if (!base64Data.reserve(PSRAM_BUFFER_READ_LENGTH))
+        if (!base64Data.reserve(PSRAM_BUFFER_READ_ENCODED_LENGTH))
         {
             Serial.println("Reserve memory failed");
             return;
