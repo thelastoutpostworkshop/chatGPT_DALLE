@@ -326,7 +326,7 @@ void setupCommands(void)
         });
 }
 
-const char* fetchBase64Image(char *host, uint16_t port, char *page)
+const char *fetchBase64Image(char *host, uint16_t port, char *page)
 {
     WiFiClient client;
 
@@ -351,37 +351,70 @@ const char* fetchBase64Image(char *host, uint16_t port, char *page)
         }
     }
 
-    String line, base64Data = "";
-    bool isBase64DataStart = false;
-
-    // Read all lines of the reply
-    while (client.available())
+    // Initialize a String object for base64 data in PSRAM
+    String base64Data;
+    if (psramFound())
     {
-        line = client.readStringUntil('\r');
-        Serial.println(line);
+        base64Data.reserve(10000); // Reserve large size to reduce reallocations
+    }
 
-        // Look for the base64 encoded image in the HTML content
-        if (isBase64DataStart || line.indexOf("data:image/png;base64,") != -1)
+    // Flags to indicate the status of base64 data reading
+    bool base64StartFound = false, base64EndFound = false;
+
+    // Buffer for reading data in chunks
+    char buffer[1024];
+    int bufferLength;
+
+    // Read and process the response in chunks
+    while (client.available() && !base64EndFound)
+    {
+        bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
+        buffer[bufferLength] = '\0'; // Null-terminate the buffer
+
+        if (!base64StartFound)
         {
-            isBase64DataStart = true; // Marks the start of the base64 data
-            base64Data += line;
+            char *base64Start = strstr(buffer, "base64,");
+            if (base64Start)
+            {
+                base64StartFound = true;
+                char *startOfData = base64Start + 7; // Skip "base64,"
+
+                // Check if the end of base64 data is in the same buffer
+                char *endOfData = strchr(startOfData, '\"');
+                if (endOfData)
+                {
+                    *endOfData = '\0'; // Replace the quote with a null terminator
+                    base64Data += startOfData;
+                    base64EndFound = true;
+                }
+                else
+                {
+                    base64Data += startOfData;
+                }
+            }
+        }
+        else
+        {
+            char *endOfData = strchr(buffer, '\"');
+            if (endOfData)
+            {
+                *endOfData = '\0'; // Replace the quote with a null terminator
+                base64Data += buffer;
+                base64EndFound = true;
+            }
+            else
+            {
+                base64Data += buffer;
+            }
         }
     }
 
-    // Extract the base64 encoded data
-    int base64StartIndex = base64Data.indexOf("data:image/png;base64,");
-    if (base64StartIndex != -1)
-    {
-        base64StartIndex += 22; // Length of "data:image/png;base64,"
-        int base64EndIndex = base64Data.indexOf("\"", base64StartIndex);
-        base64Data = base64Data.substring(base64StartIndex, base64EndIndex);
-    }
-    else
-    {
-        base64Data = "No base64 encoded image found";
-    }
-
     client.stop();
+
+    if (!base64StartFound || !base64EndFound)
+    {
+        return "Base64 data not found or incomplete";
+    }
     return base64Data.c_str();
 }
 

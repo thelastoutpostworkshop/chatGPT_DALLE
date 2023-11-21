@@ -6,8 +6,8 @@
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 1024             // Adjust for your images
-#define PSRAM_BUFFER_LENGTH 7000000L    // Memory allocation for buffer image in PSRAM
+#define MAX_IMAGE_WIDTH 1024         // Adjust for your images
+#define PSRAM_BUFFER_LENGTH 7000000L // Memory allocation for buffer image in PSRAM
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -16,7 +16,7 @@ PNG png; // PNG decoder instance
 TFT_eSPI tft = TFT_eSPI();
 
 // uint8_t output[50000L];
-uint8_t* output;
+uint8_t *output;
 
 void setup()
 {
@@ -28,18 +28,19 @@ void setup()
     // tft.setRotation(2);
     tft.fillScreen(TFT_WHITE);
 
-    Serial.printf("PSRAM Size=%ld\n",ESP.getPsramSize());
+    Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
 
-    output = (uint8_t*) ps_malloc(PSRAM_BUFFER_LENGTH);
+    output = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
 
-    if (output == NULL) {
+    if (output == NULL)
+    {
         Serial.println("Failed to allocate memory in PSRAM");
         return;
     }
 
-    const char* base64Image = fetchBase64Image("192.168.1.90",80,"test.html");
+    const char *base64Image = fetchBase64Image("192.168.1.90", 80, "test.html");
     Serial.println(base64Image);
-    
+
     size_t length = base64::decodeLength(base64Image);
     base64::decode(base64Image, output);
 
@@ -67,6 +68,10 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         tft.startWrite();
         uint32_t dt = millis();
         res = png.decode(NULL, 0);
+        if (res != PNG_SUCCESS)
+        {
+            printPngError(png.getLastError());
+        }
         Serial.print(millis() - dt);
         Serial.println("ms");
         tft.endWrite();
@@ -114,6 +119,7 @@ void pngDraw(PNGDRAW *pDraw)
     png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
     // png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, -1);
     tft.pushImage(xpos, ypos + pDraw->y, pDraw->iWidth, 1, lineBuffer);
+    Serial.printf("x=%d, y=%d", xpos, ypos);
 
     // // Print the buffer contents
     // for (int i = 0; i < MAX_IMAGE_WIDTH; i++)
