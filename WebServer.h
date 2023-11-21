@@ -326,14 +326,14 @@ void setupCommands(void)
         });
 }
 
-const char *fetchBase64Image(char *host, uint16_t port, unsigned int Base64DataBufferLength)
+void fetchBase64Image(char *host, uint16_t port, String *base64Data)
 {
     WiFiClient client;
 
     if (!client.connect(host, port))
     {
         Serial.printf("Connection failed, host=%s, port=%d\n", host, port);
-        return "";
+        return;
     }
 
     // Send the HTTP request
@@ -347,15 +347,8 @@ const char *fetchBase64Image(char *host, uint16_t port, unsigned int Base64DataB
         {
             Serial.println(">>> Client Timeout !");
             client.stop();
-            return "";
+            return;
         }
-    }
-
-    // Initialize a String object for base64 data in PSRAM
-    String base64Data;
-    if (psramFound())
-    {
-        base64Data.reserve(Base64DataBufferLength); // Reserve large size to reduce reallocations
     }
 
     // Flags to indicate the status of base64 data reading
@@ -385,28 +378,28 @@ const char *fetchBase64Image(char *host, uint16_t port, unsigned int Base64DataB
                 {
                     Serial.println("End of Data in the same Buffer");
                     *endOfData = '\0'; // Replace the quote with a null terminator
-                    base64Data += startOfData;
+                    *base64Data += startOfData;
                     base64EndFound = true;
                 }
                 else
                 {
-                    base64Data += startOfData;
+                    *base64Data += startOfData;
                 }
             }
         }
         else
         {
-            char *endOfData = strstr(buffer,"\">");
+            char *endOfData = strstr(buffer, "\">");
             if (endOfData)
             {
                 Serial.println("End of Data in a different Buffer");
                 *endOfData = '\0'; // Replace the quote with a null terminator
-                base64Data += buffer;
+                *base64Data += buffer;
                 base64EndFound = true;
             }
             else
             {
-                base64Data += buffer;
+                *base64Data += buffer;
             }
         }
     }
@@ -415,9 +408,8 @@ const char *fetchBase64Image(char *host, uint16_t port, unsigned int Base64DataB
 
     if (!base64StartFound || !base64EndFound)
     {
-        return "Base64 data not found or incomplete";
+        Serial.println("Base64 data not found or incomplete");
     }
-    return base64Data.c_str();
 }
 
 void initWebServer()

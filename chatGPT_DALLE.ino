@@ -7,8 +7,8 @@
 #include "rainbowBase64Png.h"
 
 #define MAX_IMAGE_WIDTH 1024                // Adjust for your images
-#define PSRAM_BUFFER_LENGTH 4000000L        // Memory allocation for buffer image in PSRAM
-#define PSRAM_BUFFER_READ_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data
+#define PSRAM_BUFFER_LENGTH 4000000L        // Memory allocation for buffer base64 data decoding in PSRAM
+#define PSRAM_BUFFER_READ_LENGTH 2000000L   // Memory allocation for reading the base64 encoded data in PSRAM
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -17,7 +17,8 @@ PNG png; // PNG decoder instance
 TFT_eSPI tft = TFT_eSPI();
 
 // uint8_t output[50000L];
-uint8_t *output;
+String base64Data;                 // String buffer for base64 encoded Data
+uint8_t *decodedBase64Data;        // Buffer to decode base64 data
 
 void setup()
 {
@@ -31,23 +32,28 @@ void setup()
 
     Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
 
-    output = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
-    if (output == NULL)
+    decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_LENGTH);
+    if (decodedBase64Data == NULL)
     {
         Serial.println("Failed to allocate memory in PSRAM for image Buffer");
         return;
     }
 
-    const char *base64Image = fetchBase64Image("192.168.1.90", 80, PSRAM_BUFFER_READ_LENGTH);
-    Serial.printf("Size of encoded data = %u\n",strlen(base64Image));
+    if (psramFound())
+    {
+        base64Data.reserve(PSRAM_BUFFER_READ_LENGTH); 
+    }
 
-    size_t length = base64::decodeLength(base64Image);
-    base64::decode(base64Image, output);
+    fetchBase64Image("192.168.1.90", 80, &base64Data);
+    Serial.printf("Size of encoded data = %u\n",strlen(base64Data.c_str()));
+
+    size_t length = base64::decodeLength(base64Data.c_str());
+    base64::decode(base64Data.c_str(), decodedBase64Data);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
     // displayPngFromRam(panda,sizeof(panda));
-    displayPngFromRam(output, length);
+    displayPngFromRam(decodedBase64Data, length);
     // Serial.println((const char *)output);
 }
 
