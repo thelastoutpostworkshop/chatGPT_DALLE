@@ -55,18 +55,18 @@ void setup()
         Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
     }
 
-    // fetchBase64Image("192.168.1.90", 80, &base64Data);
-    // Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
+    fetchBase64Image("192.168.1.90", 80, &base64Data);
+    Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
 
-    // size_t length = base64::decodeLength(base64Data.c_str());
-    // base64::decode(base64Data.c_str(), decodedBase64Data);
+    size_t length = base64::decodeLength(base64Data.c_str());
+    base64::decode(base64Data.c_str(), decodedBase64Data);
 
-    // Serial.printf("base64 decoded length = %ld\n", length);
+    Serial.printf("base64 decoded length = %ld\n", length);
 
-    // displayPngFromRam(decodedBase64Data, length);
+    displayPngFromRam(decodedBase64Data, length);
 
-    callOpenAIAPIDalle(&base64Data);
-    Serial.println(base64Data);
+    // callOpenAIAPIDalle(&base64Data);
+    // Serial.println(base64Data);
 }
 
 void loop()
