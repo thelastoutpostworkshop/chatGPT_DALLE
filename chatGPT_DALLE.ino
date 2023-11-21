@@ -90,7 +90,7 @@ void callOpenAIAPIDalle(String *readBuffer)
         return;
     }
 
-    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"a star wars ship flyinh through stars\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
+    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"a star wars ship flying through stars\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
 
     String request = "POST /v1/images/generations HTTP/1.1\r\n";
     request += "Host: " + String(host) + "\r\n";
@@ -107,6 +107,7 @@ void callOpenAIAPIDalle(String *readBuffer)
     while (client.connected())
     {
         String line = client.readStringUntil('\n');
+        // Serial.println(line);
         if (line == "\r")
         {
             Serial.println("headers received");
@@ -125,7 +126,7 @@ void callOpenAIAPIDalle(String *readBuffer)
     {
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
         buffer[bufferLength] = '\0'; // Null-terminate the buffer
-
+        Serial.println(buffer);
         if (!base64StartFound)
         {
             char *base64Start = strstr(buffer, startToken);
@@ -152,7 +153,7 @@ void callOpenAIAPIDalle(String *readBuffer)
         }
         else
         {
-            char *endOfData = strstr(buffer, "\">");
+            char *endOfData = strstr(buffer, "\"");
             if (endOfData)
             {
                 *endOfData = '\0'; // Replace the quote with a null terminator
@@ -167,6 +168,11 @@ void callOpenAIAPIDalle(String *readBuffer)
     }
 
     client.stop();
+    if (!base64StartFound)
+    {
+        Serial.println("Error received:");
+        Serial.println(buffer);
+    }
     Serial.println("Request call completed");
 }
 
