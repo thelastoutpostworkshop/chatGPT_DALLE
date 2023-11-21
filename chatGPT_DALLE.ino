@@ -126,7 +126,7 @@ void callOpenAIAPIDalle(String *readBuffer)
     {
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
         buffer[bufferLength] = '\0'; // Null-terminate the buffer
-        Serial.println(buffer);
+        // Serial.println(buffer);
         if (!base64StartFound)
         {
             char *base64Start = strstr(buffer, startToken);
