@@ -119,7 +119,6 @@ void pngDraw(PNGDRAW *pDraw)
     png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
     // png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, -1);
     tft.pushImage(xpos, ypos + pDraw->y, pDraw->iWidth, 1, lineBuffer);
-    Serial.printf("x=%d, y=%d", xpos, ypos);
 
     // // Print the buffer contents
     // for (int i = 0; i < MAX_IMAGE_WIDTH; i++)
