@@ -4,8 +4,9 @@
 #include "arduino_base64.hpp"
 
 #include "mandalaBase64Png.h"
+#include "rainbowBase64Png.h"
 
-#define MAX_IMAGE_WIDTH 240             // Adjust for your images
+#define MAX_IMAGE_WIDTH 1024             // Adjust for your images
 #define PSRAM_BUFFER_LENGTH 7000000L    // Memory allocation for buffer image in PSRAM
 
 int16_t xpos = 0;
@@ -36,12 +37,11 @@ void setup()
         return;
     }
 
-    String base64Image = fetchBase64Image("192.168.1.90",80,"test.html");
-    // String base64Image = fetchBase64Image("api.thingspeak.com",80,"");
+    const char* base64Image = fetchBase64Image("192.168.1.90",80,"test.html");
     Serial.println(base64Image);
     
-    size_t length = base64::decodeLength(base64Image.c_str());
-    base64::decode(mandalaBase64Png, output);
+    size_t length = base64::decodeLength(base64Image);
+    base64::decode(base64Image, output);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 

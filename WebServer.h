@@ -326,7 +326,7 @@ void setupCommands(void)
         });
 }
 
-String fetchBase64Image(char *host, uint16_t port, char *page)
+const char* fetchBase64Image(char *host, uint16_t port, char *page)
 {
     WiFiClient client;
 
@@ -382,7 +382,7 @@ String fetchBase64Image(char *host, uint16_t port, char *page)
     }
 
     client.stop();
-    return base64Data;
+    return base64Data.c_str();
 }
 
 void initWebServer()
