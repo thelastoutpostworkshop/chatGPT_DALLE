@@ -65,6 +65,7 @@ void setup()
     // displayPngFromRam(decodedBase64Data, length);
 
     callOpenAIAPIDalle(base64Data);
+    Serial.println(base64Data);
 }
 
 void loop()
@@ -102,6 +103,18 @@ void callOpenAIAPIDalle(String readBuffer)
 
     Serial.println("Request sent");
 
+    // // Wait for the response
+    // unsigned long timeout = millis();
+    // while (client.available() == 0)
+    // {
+    //     if (millis() - timeout > 5000)
+    //     {
+    //         Serial.println(">>> API Timeout !");
+    //         client.stop();
+    //         return;
+    //     }
+    // }
+
     // Buffer for reading data in chunks
     int bufferLength = 1024;
     char buffer[bufferLength];
@@ -110,8 +123,8 @@ void callOpenAIAPIDalle(String readBuffer)
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
         buffer[bufferLength] = '\0'; // Null-terminate the buffer
         readBuffer += buffer;
+        Serial.printf("Buffer read size=%u\n", bufferLength);
     }
-
     Serial.println("Request call completed");
 }
 
