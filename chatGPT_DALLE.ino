@@ -27,7 +27,7 @@ void setup()
     createTaskCore();
 
     tft.begin();
-    // tft.setRotation(2);
+    tft.setRotation(2);
     tft.fillScreen(TFT_BLACK);
 
     if (psramFound())
