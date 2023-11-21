@@ -103,28 +103,28 @@ void callOpenAIAPIDalle(String readBuffer)
 
     Serial.println("Request sent");
 
-    // // Wait for the response
-    // unsigned long timeout = millis();
-    // while (client.available() == 0)
-    // {
-    //     if (millis() - timeout > 5000)
-    //     {
-    //         Serial.println(">>> API Timeout !");
-    //         client.stop();
-    //         return;
-    //     }
-    // }
-
+    while (client.connected()) {
+      String line = client.readStringUntil('\n');
+      if (line == "\r") {
+        Serial.println("headers received");
+        break;
+      }
+    }
     // Buffer for reading data in chunks
     int bufferLength = 1024;
     char buffer[bufferLength];
-    while (client.connected() && bufferLength == 1024)
+    while (client.available())
     {
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
         buffer[bufferLength] = '\0'; // Null-terminate the buffer
         readBuffer += buffer;
         Serial.printf("Buffer read size=%u\n", bufferLength);
+        Serial.println(buffer);
+        if(bufferLength < 1023) {
+            break;
+        }
     }
+    client.stop();
     Serial.println("Request call completed");
 }
 
