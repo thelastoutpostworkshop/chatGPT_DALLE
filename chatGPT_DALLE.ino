@@ -6,6 +6,7 @@
 
 #include "base64_test_images\mandalaBase64Png.h"
 #include "base64_test_images\rainbowBase64Png.h"
+#include "base64_test_images\resistance.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -75,9 +76,9 @@ void setup()
 
     // displayPngFromRam(decodedBase64Data, length);
 
-    testPngImage();
-    delay(5000);
-    generateDalleImageRandomPrompt();
+    testPngImage(resistance64Png);
+    // delay(5000);
+    // generateDalleImageRandomPrompt();
 }
 
 void loop()
@@ -308,10 +309,10 @@ void printPngError(int errorCode)
     }
 }
 
-void testPngImage(void) {
+void testPngImage(const char* imageBase64Png) {
     // Memory Test
-    size_t length = base64::decodeLength(mandalaBase64Png);
-    base64::decode(mandalaBase64Png, decodedBase64Data);
+    size_t length = base64::decodeLength(imageBase64Png);
+    base64::decode(imageBase64Png, decodedBase64Data);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
