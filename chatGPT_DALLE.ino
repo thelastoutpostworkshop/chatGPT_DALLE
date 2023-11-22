@@ -40,6 +40,7 @@ void setup()
     tft.setRotation(2);
     tft.fillScreen(TFT_BLACK);
 
+    // Memory allocation in PSRAM
     if (psramFound())
     {
 
