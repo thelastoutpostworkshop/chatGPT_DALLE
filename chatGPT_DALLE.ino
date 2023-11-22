@@ -6,6 +6,7 @@
 
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
+#include "test_planet.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
