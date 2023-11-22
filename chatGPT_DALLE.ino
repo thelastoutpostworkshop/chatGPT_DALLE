@@ -4,13 +4,16 @@
 #include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
 
-#include "mandalaBase64Png.h"
-#include "rainbowBase64Png.h"
+#include "base64_test_images\mandalaBase64Png.h"
+#include "base64_test_images\rainbowBase64Png.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
 #define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Length of buffer for reading the base64 encoded data in PSRAM
 #define BUFFER_RESPONSE_LENGTH 1024               // Length of buffer for reading api response in chunks
+
+const char *startToken = "\"b64_json\": \"";
+const char *endToken = "\"";
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -55,6 +58,7 @@ void setup()
         Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
     }
 
+    // Web Test
     // fetchBase64Image("192.168.1.90", 80, &base64Data);
     // Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
 
@@ -65,14 +69,22 @@ void setup()
 
     // displayPngFromRam(decodedBase64Data, length);
 
-    callOpenAIAPIDalle(&base64Data);
-    // Serial.println(base64Data);
-    size_t length = base64::decodeLength(base64Data.c_str());
-    base64::decode(base64Data.c_str(), decodedBase64Data);
+    // Memory Test
+    size_t length = base64::decodeLength(mandalaBase64Png);
+    base64::decode(mandalaBase64Png, decodedBase64Data);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length);
+
+    // OpenAPI
+    // callOpenAIAPIDalle(&base64Data);
+    // size_t length = base64::decodeLength(base64Data.c_str());
+    // base64::decode(base64Data.c_str(), decodedBase64Data);
+
+    // Serial.printf("base64 decoded length = %ld\n", length);
+
+    // displayPngFromRam(decodedBase64Data, length);
 }
 
 void loop()
@@ -124,8 +136,6 @@ void callOpenAIAPIDalle(String *readBuffer)
     // Read the response in chunks
     int bufferLength = BUFFER_RESPONSE_LENGTH;
     char buffer[bufferLength];
-    const char *startToken = "\"b64_json\": \"";
-    const char *endToken = "\"";
     bool base64StartFound = false, base64EndFound = false;
 
     // Read and process the response in chunks
@@ -139,7 +149,6 @@ void callOpenAIAPIDalle(String *readBuffer)
             char *base64Start = strstr(buffer, startToken);
             if (base64Start)
             {
-                Serial.println("base64StartFound");
                 base64StartFound = true;
                 char *startOfData = base64Start + strlen(startToken); // Skip "base64,"
 
@@ -147,7 +156,6 @@ void callOpenAIAPIDalle(String *readBuffer)
                 char *endOfData = strstr(startOfData, endToken);
                 if (endOfData)
                 {
-                    Serial.println("endOfData");
                     *endOfData = '\0'; // Replace the quote with a null terminator
                     *readBuffer += startOfData;
                     base64EndFound = true;
@@ -163,7 +171,6 @@ void callOpenAIAPIDalle(String *readBuffer)
             char *endOfData = strstr(buffer, endToken);
             if (endOfData)
             {
-                Serial.println("endOfData");
                 *endOfData = '\0'; // Replace the quote with a null terminator
                 *readBuffer += buffer;
                 base64EndFound = true;
