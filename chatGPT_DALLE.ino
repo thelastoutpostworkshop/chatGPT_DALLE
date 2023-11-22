@@ -17,8 +17,8 @@ const char *startToken = "\"b64_json\": \"";
 const char *endToken = "\"";
 
 // Prompts
-const char *prompts[] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene", "An empire spaceship attacking"};
-const int promptsCount = 4;
+char *prompts[] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene", "An empire spaceship attacking"};
+int promptsCount = 4;
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -82,20 +82,28 @@ void setup()
 
     // displayPngFromRam(decodedBase64Data, length);
 
-    // OpenAPI
-    const char* randomPrompt = prompts[myRandom(promptsCount)];
-    callOpenAIAPIDalle(&base64Data, randomPrompt);
+    generateDalleImageRandomPrompt();
+}
+
+void loop()
+{
+    delay(1);
+}
+
+void generateDalleImageRandomPrompt(void) {
+    char *randomPrompt = prompts[myRandom(promptsCount)];
+    genereteDalleImage(randomPrompt);
+}
+
+void genereteDalleImage(char *prompt)
+{
+    callOpenAIAPIDalle(&base64Data, prompt);
     size_t length = base64::decodeLength(base64Data.c_str());
     base64::decode(base64Data.c_str(), decodedBase64Data);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length);
-}
-
-void loop()
-{
-    delay(1);
 }
 
 void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
@@ -305,15 +313,19 @@ void printPngError(int errorCode)
     }
 }
 
-long myRandom(long howbig) {
-    if (howbig == 0) {
+long myRandom(long howbig)
+{
+    if (howbig == 0)
+    {
         return 0;
     }
     return esp_random() % howbig;
 }
 
-long myRandom(long howsmall, long howbig) {
-    if (howsmall >= howbig) {
+long myRandom(long howsmall, long howbig)
+{
+    if (howsmall >= howbig)
+    {
         return howsmall;
     }
     long diff = howbig - howsmall;
