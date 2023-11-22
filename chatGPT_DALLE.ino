@@ -6,7 +6,6 @@
 
 #include "base64_test_images\mandalaBase64Png.h"
 #include "base64_test_images\rainbowBase64Png.h"
-#include "base64_test_images\planet.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -71,21 +70,21 @@ void setup()
     // displayPngFromRam(decodedBase64Data, length);
 
     // Memory Test
-    size_t length = base64::decodeLength(planetbase64Png);
-    base64::decode(planetbase64Png, decodedBase64Data);
-
-    Serial.printf("base64 decoded length = %ld\n", length);
-
-    displayPngFromRam(decodedBase64Data, length);
-
-    // OpenAPI
-    // callOpenAIAPIDalle(&base64Data);
-    // size_t length = base64::decodeLength(base64Data.c_str());
-    // base64::decode(base64Data.c_str(), decodedBase64Data);
+    // size_t length = base64::decodeLength(planetbase64Png);
+    // base64::decode(planetbase64Png, decodedBase64Data);
 
     // Serial.printf("base64 decoded length = %ld\n", length);
 
     // displayPngFromRam(decodedBase64Data, length);
+
+    // OpenAPI
+    callOpenAIAPIDalle(&base64Data,"An alien planet with ships orbiting");
+    size_t length = base64::decodeLength(base64Data.c_str());
+    base64::decode(base64Data.c_str(), decodedBase64Data);
+
+    Serial.printf("base64 decoded length = %ld\n", length);
+
+    displayPngFromRam(decodedBase64Data, length);
 }
 
 void loop()
@@ -93,7 +92,7 @@ void loop()
     delay(1);
 }
 
-void callOpenAIAPIDalle(String *readBuffer)
+void callOpenAIAPIDalle(String *readBuffer,const char *prompt)
 {
     *readBuffer = ""; // Clear the buffer
 
@@ -109,7 +108,9 @@ void callOpenAIAPIDalle(String *readBuffer)
         return;
     }
 
-    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"a star wars ship flying through stars\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
+    String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"";
+    jsonPayload += prompt;
+    jsonPayload+="\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
 
     String request = "POST /v1/images/generations HTTP/1.1\r\n";
     request += "Host: " + String(host) + "\r\n";
@@ -121,7 +122,7 @@ void callOpenAIAPIDalle(String *readBuffer)
 
     client.print(request);
 
-    Serial.println("Request sent");
+    Serial.printf("Request sent with prompt : %s\n",prompt);
 
     while (client.connected())
     {
