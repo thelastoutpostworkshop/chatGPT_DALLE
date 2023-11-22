@@ -6,7 +6,6 @@
 
 #include "mandalaBase64Png.h"
 #include "rainbowBase64Png.h"
-#include "base64_test_images\test_planet.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -56,18 +55,24 @@ void setup()
         Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
     }
 
-    fetchBase64Image("192.168.1.90", 80, &base64Data);
-    Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
+    // fetchBase64Image("192.168.1.90", 80, &base64Data);
+    // Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
 
+    // size_t length = base64::decodeLength(base64Data.c_str());
+    // base64::decode(base64Data.c_str(), decodedBase64Data);
+
+    // Serial.printf("base64 decoded length = %ld\n", length);
+
+    // displayPngFromRam(decodedBase64Data, length);
+
+    callOpenAIAPIDalle(&base64Data);
+    // Serial.println(base64Data);
     size_t length = base64::decodeLength(base64Data.c_str());
     base64::decode(base64Data.c_str(), decodedBase64Data);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length);
-
-    // callOpenAIAPIDalle(&base64Data);
-    // Serial.println(base64Data);
 }
 
 void loop()
@@ -119,7 +124,8 @@ void callOpenAIAPIDalle(String *readBuffer)
     // Read the response in chunks
     int bufferLength = BUFFER_RESPONSE_LENGTH;
     char buffer[bufferLength];
-    char *startToken = "\"b64_json\": \"";
+    const char *startToken = "\"b64_json\": \"";
+    const char *endToken = "\"";
     bool base64StartFound = false, base64EndFound = false;
 
     // Read and process the response in chunks
@@ -138,7 +144,7 @@ void callOpenAIAPIDalle(String *readBuffer)
                 char *startOfData = base64Start + strlen(startToken); // Skip "base64,"
 
                 // Check if the end of base64 data is in the same buffer
-                char *endOfData = strchr(startOfData, '\"');
+                char *endOfData = strstr(startOfData, endToken);
                 if (endOfData)
                 {
                     Serial.println("endOfData");
@@ -154,9 +160,10 @@ void callOpenAIAPIDalle(String *readBuffer)
         }
         else
         {
-            char *endOfData = strstr(buffer, "\"");
+            char *endOfData = strstr(buffer, endToken);
             if (endOfData)
             {
+                Serial.println("endOfData");
                 *endOfData = '\0'; // Replace the quote with a null terminator
                 *readBuffer += buffer;
                 base64EndFound = true;
