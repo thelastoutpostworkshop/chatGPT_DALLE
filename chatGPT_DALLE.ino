@@ -201,7 +201,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     client.stop();
     if (!base64StartFound)
     {
-        Serial.println("Error received:");
+        Serial.println("No Json Base64 data in Response:");
         Serial.println(buffer);
     }
     Serial.println("Request call completed");
