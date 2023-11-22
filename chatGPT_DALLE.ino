@@ -55,7 +55,7 @@ void setup()
 
         if (!base64Data.reserve(PSRAM_BUFFER_READ_ENCODED_LENGTH))
         {
-            Serial.println("Reserve memory failed");
+            Serial.println("Failed to allocate memory in PSRAM for deconding base64 Data");
             return;
         }
     }
