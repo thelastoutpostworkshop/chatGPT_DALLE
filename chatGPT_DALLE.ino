@@ -12,8 +12,13 @@
 #define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Length of buffer for reading the base64 encoded data in PSRAM
 #define BUFFER_RESPONSE_LENGTH 1024               // Length of buffer for reading api response in chunks
 
+// Delimiters to extract base64 data in Json
 const char *startToken = "\"b64_json\": \"";
 const char *endToken = "\"";
+
+// Prompts
+const char *prompts[] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene", "An empire spaceship attacking"};
+const int promptsCount = 4;
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -78,7 +83,8 @@ void setup()
     // displayPngFromRam(decodedBase64Data, length);
 
     // OpenAPI
-    callOpenAIAPIDalle(&base64Data,"An alien planet with ships orbiting");
+    const char* randomPrompt = prompts[myRandom(promptsCount)];
+    callOpenAIAPIDalle(&base64Data, randomPrompt);
     size_t length = base64::decodeLength(base64Data.c_str());
     base64::decode(base64Data.c_str(), decodedBase64Data);
 
@@ -92,7 +98,7 @@ void loop()
     delay(1);
 }
 
-void callOpenAIAPIDalle(String *readBuffer,const char *prompt)
+void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 {
     *readBuffer = ""; // Clear the buffer
 
@@ -110,7 +116,7 @@ void callOpenAIAPIDalle(String *readBuffer,const char *prompt)
 
     String jsonPayload = "{\"model\": \"dall-e-2\", \"prompt\": \"";
     jsonPayload += prompt;
-    jsonPayload+="\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
+    jsonPayload += "\", \"n\": 1, \"size\": \"256x256\", \"response_format\": \"b64_json\"}";
 
     String request = "POST /v1/images/generations HTTP/1.1\r\n";
     request += "Host: " + String(host) + "\r\n";
@@ -122,7 +128,7 @@ void callOpenAIAPIDalle(String *readBuffer,const char *prompt)
 
     client.print(request);
 
-    Serial.printf("Request sent with prompt : %s\n",prompt);
+    Serial.printf("Request sent with prompt : %s\n", prompt);
 
     while (client.connected())
     {
@@ -297,4 +303,19 @@ void printPngError(int errorCode)
         Serial.println("PNG Error Unknown");
         break;
     }
+}
+
+long myRandom(long howbig) {
+    if (howbig == 0) {
+        return 0;
+    }
+    return esp_random() % howbig;
+}
+
+long myRandom(long howsmall, long howbig) {
+    if (howsmall >= howbig) {
+        return howsmall;
+    }
+    long diff = howbig - howsmall;
+    return esp_random() % diff + howsmall;
 }
