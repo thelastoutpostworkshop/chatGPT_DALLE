@@ -74,14 +74,8 @@ void setup()
 
     // displayPngFromRam(decodedBase64Data, length);
 
-    // Memory Test
-    // size_t length = base64::decodeLength(planetbase64Png);
-    // base64::decode(planetbase64Png, decodedBase64Data);
-
-    // Serial.printf("base64 decoded length = %ld\n", length);
-
-    // displayPngFromRam(decodedBase64Data, length);
-
+    testPngImage();
+    delay(5000);
     generateDalleImageRandomPrompt();
 }
 
@@ -311,6 +305,16 @@ void printPngError(int errorCode)
         Serial.println("PNG Error Unknown");
         break;
     }
+}
+
+void testPngImage(void) {
+    // Memory Test
+    size_t length = base64::decodeLength(mandalaBase64Png);
+    base64::decode(mandalaBase64Png, decodedBase64Data);
+
+    Serial.printf("base64 decoded length = %ld\n", length);
+
+    displayPngFromRam(decodedBase64Data, length);
 }
 
 long myRandom(long howbig)
