@@ -33,6 +33,9 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 
 // Display
+#define ACTIVATE_CURRENT_DISPLAY() digitalWrite(csPins[currentDisplay], LOW)    // Macro to activate for write the current display
+#define DEACTIVATE_CURRENT_DISPLAY() digitalWrite(csPins[currentDisplay], HIGH) // Macro to de-activate for write the current display
+
 #define STORED_IMAGES_LENGTH 250000L              // Max size of image storage
 const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
 const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
@@ -67,8 +70,8 @@ void setup()
         }
     }
 
-    // size_t length = testPngImage(testImages[myRandom(promptsCount)]);
-    size_t length = generateDalleImageRandomPrompt();
+    size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
+    // size_t length = generateDalleImageRandomPrompt();
     if (length > STORED_IMAGES_LENGTH)
     {
         Serial.printf("!!! Cannot store image, too large=%u\n", length);
@@ -236,7 +239,7 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
 
-        digitalWrite(csPins[currentDisplay], LOW); // Select the display
+        ACTIVATE_CURRENT_DISPLAY();
         tft.startWrite();
         uint32_t dt = millis();
         res = png.decode(NULL, 0);
@@ -247,13 +250,21 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.print(millis() - dt);
         Serial.println("ms");
         tft.endWrite();
-        digitalWrite(csPins[currentDisplay], HIGH); // De-Select the display
+        DEACTIVATE_CURRENT_DISPLAY();
 
         // png.close(); // not needed for memory->memory decode
     }
     else
     {
         printPngError(res);
+    }
+}
+
+void changeDisplayTo(int displayIndex) {
+    if(displayIndex >= 0 && displayIndex < NUM_DISPLAYS) {
+        currentDisplay = displayIndex;
+    } else {
+        Serial.printf("!!! Display index wrong = %d\n",displayIndex);
     }
 }
 
