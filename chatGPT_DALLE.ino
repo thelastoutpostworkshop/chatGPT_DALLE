@@ -52,7 +52,7 @@ void setup()
 
     if (!initDisplay())
     {
-        Serial.println("Cannot allocate enoug PSRAM to store images");
+        Serial.println("!!! Cannot allocate enoug PSRAM to store images");
         while (true)
         {
             // Infinite loop, code execution useless without PSRAM
@@ -67,7 +67,16 @@ void setup()
         }
     }
 
-    testPngImage(testImages[myRandom(promptsCount)]);
+    size_t length = testPngImage(testImages[myRandom(promptsCount)]);
+    if (length > STORED_IMAGES_LENGTH)
+    {
+        Serial.printf("!!! Cannot store image, too large=%u\n", length);
+    }
+    else
+    {
+        memcpy(storedImages[currentDisplay], decodedBase64Data, length);
+    }
+
     // delay(5000);
     // generateDalleImageRandomPrompt();
 }
@@ -83,7 +92,7 @@ bool initDisplay(void)
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         pinMode(csPins[i], OUTPUT);
-        digitalWrite(csPins[i], LOW);   // select the display
+        digitalWrite(csPins[i], LOW); // select the display
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
         digitalWrite(csPins[i], HIGH); // Deselect the display
@@ -257,19 +266,19 @@ bool allocatePsramMemory(void)
         decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_DECODED_LENGTH);
         if (decodedBase64Data == NULL)
         {
-            Serial.println("Failed to allocate memory in PSRAM for image Buffer");
+            Serial.println("!!! Failed to allocate memory in PSRAM for image Buffer");
             return false;
         }
 
         if (!base64Data.reserve(PSRAM_BUFFER_READ_ENCODED_LENGTH))
         {
-            Serial.println("Failed to allocate memory in PSRAM for deconding base64 Data");
+            Serial.println("!!! Failed to allocate memory in PSRAM for deconding base64 Data");
             return false;
         }
     }
     else
     {
-        Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
+        Serial.println("!!! No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
         return false;
     }
     return true;
@@ -325,36 +334,36 @@ void printPngError(int errorCode)
     switch (errorCode)
     {
     case PNG_SUCCESS:
-        Serial.println("PNG Success!");
+        Serial.println("!!! PNG Success!");
         break;
     case PNG_INVALID_PARAMETER:
-        Serial.println("PNG Error Invalid Parameter");
+        Serial.println("!!! PNG Error Invalid Parameter");
         break;
     case PNG_DECODE_ERROR:
-        Serial.println("PNG Error Decode");
+        Serial.println("!!! PNG Error Decode");
         break;
     case PNG_MEM_ERROR:
-        Serial.println("PNG Error Memory");
+        Serial.println("!!! PNG Error Memory");
         break;
     case PNG_NO_BUFFER:
-        Serial.println("PNG Error No Buffer");
+        Serial.println("!!! PNG Error No Buffer");
         break;
     case PNG_UNSUPPORTED_FEATURE:
-        Serial.println("PNG Error Unsupported Feature");
+        Serial.println("!!! PNG Error Unsupported Feature");
         break;
     case PNG_INVALID_FILE:
-        Serial.println("PNG Error Invalid File");
+        Serial.println("!!! PNG Error Invalid File");
         break;
     case PNG_TOO_BIG:
-        Serial.println("PNG Error Too Big");
+        Serial.println("!!! PNG Error Too Big");
         break;
     default:
-        Serial.println("PNG Error Unknown");
+        Serial.println("!!! PNG Error Unknown");
         break;
     }
 }
 
-const char *testPngImage(const char *imageBase64Png)
+size_t testPngImage(const char *imageBase64Png)
 {
     size_t length = base64::decodeLength(imageBase64Png);
     Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
@@ -363,7 +372,7 @@ const char *testPngImage(const char *imageBase64Png)
     Serial.printf("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length);
-    return imageBase64Png;
+    return length;
 }
 
 long myRandom(long howbig)
