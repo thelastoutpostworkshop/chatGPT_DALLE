@@ -33,8 +33,10 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 
 // Display
+#define STORED_IMAGES_LENGTH 50000L              // Max size of image storage
 const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
 const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
+String storedImages[NUM_DISPLAYS];               // Images stored for each screen
 int currentDisplay = 0;
 TFT_eSPI tft = TFT_eSPI();
 
@@ -48,7 +50,14 @@ void setup()
     initWebServer();
     createTaskCore();
 
-    initDisplay();
+    if (!initDisplay())
+    {
+        Serial.println("Cannot allocate enoug PSRAM to store images");
+        while (true)
+        {
+            // Infinite loop, code execution useless without PSRAM
+        }
+    }
 
     if (!allocatePsramMemory())
     {
@@ -68,7 +77,7 @@ void loop()
     delay(1);
 }
 
-void initDisplay(void)
+bool initDisplay(void)
 {
     tft.init();
     for (int i = 0; i < NUM_DISPLAYS; i++)
@@ -78,7 +87,12 @@ void initDisplay(void)
         tft.fillScreen(TFT_WHITE);
         tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
         digitalWrite(csPins[i], HIGH); // Deselect the display
+        if (!storedImages[i].reserve(STORED_IMAGES_LENGTH))
+        {
+            return false;
+        }
     }
+    return true;
 }
 
 void generateDalleImageRandomPrompt(void)
