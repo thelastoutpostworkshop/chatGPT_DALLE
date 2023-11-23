@@ -30,4 +30,12 @@ public:
             memcpy(storedImage, image, length);
         }
     }
+    void activate(void)
+    {
+        digitalWrite(csPin, LOW);
+    }
+    void deActivate(void)
+    {
+        digitalWrite(csPin, HIGH);
+    }
 };

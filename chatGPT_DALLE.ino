@@ -41,8 +41,7 @@ Display display[NUM_DISPLAYS] = {
     Display(6),
     Display(16)};
 int currentDisplay = 0;
-#define ACTIVATE_CURRENT_DISPLAY() digitalWrite(display[currentDisplay].csPin, LOW)    // Macro to activate for write the current display
-#define DEACTIVATE_CURRENT_DISPLAY() digitalWrite(display[currentDisplay].csPin, HIGH) // Macro to de-activate for write the current display
+
 TFT_eSPI tft = TFT_eSPI();
 
 // uint8_t output[50000L];
@@ -234,7 +233,7 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
 
-        ACTIVATE_CURRENT_DISPLAY();
+        display[currentDisplay].activate();
         tft.startWrite();
         uint32_t dt = millis();
         res = png.decode(NULL, 0);
@@ -245,7 +244,7 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.print(millis() - dt);
         Serial.println("ms");
         tft.endWrite();
-        DEACTIVATE_CURRENT_DISPLAY();
+        display[currentDisplay].deActivate();
 
         // png.close(); // not needed for memory->memory decode
     }
