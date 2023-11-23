@@ -7,6 +7,7 @@
 #include "base64_test_images\mandalaBase64Png.h"
 #include "base64_test_images\rainbowBase64Png.h"
 #include "base64_test_images\resistance.h"
+#include "base64_test_images\spaceship.h"
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -49,7 +50,7 @@ void setup()
         }
     }
 
-    testPngImage(resistance64Png);
+    testPngImage(spaceship64Png);
     // delay(5000);
     // generateDalleImageRandomPrompt();
 }
