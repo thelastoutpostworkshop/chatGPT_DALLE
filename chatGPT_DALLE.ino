@@ -23,6 +23,11 @@ const char *endToken = "\"";
 char *prompts[] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene", "An empire spaceship attacking"};
 int promptsCount = 4;
 
+
+// Test PNG Images
+const char* testImages[] = {mandalaBase64Png,resistance64Png,spaceship64Png,hal64Png};
+const int testImagesCount = 4;
+
 int16_t xpos = 0;
 int16_t ypos = 0;
 
@@ -51,7 +56,7 @@ void setup()
         }
     }
 
-    testPngImage(hal64Png);
+    testPngImage(testImages[myRandom(promptsCount)]);
     // delay(5000);
     // generateDalleImageRandomPrompt();
 }
