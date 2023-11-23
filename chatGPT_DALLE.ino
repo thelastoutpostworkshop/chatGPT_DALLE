@@ -23,15 +23,19 @@ const char *endToken = "\"";
 char *prompts[] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene", "An empire spaceship attacking"};
 int promptsCount = 4;
 
-
 // Test PNG Images
-const char* testImages[] = {mandalaBase64Png,resistance64Png,spaceship64Png,hal64Png};
+const char *testImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png, hal64Png};
 const int testImagesCount = 4;
 
 int16_t xpos = 0;
 int16_t ypos = 0;
 
 PNG png; // PNG decoder instance
+
+// Display
+const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
+const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
+int currentDisplay = 0;
 TFT_eSPI tft = TFT_eSPI();
 
 // uint8_t output[50000L];
@@ -44,9 +48,7 @@ void setup()
     initWebServer();
     createTaskCore();
 
-    tft.begin();
-    tft.setRotation(2);
-    tft.fillScreen(TFT_BLACK);
+    initDisplay();
 
     if (!allocatePsramMemory())
     {
@@ -64,6 +66,19 @@ void setup()
 void loop()
 {
     delay(1);
+}
+
+void initDisplay(void)
+{
+    tft.init();
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        pinMode(csPins[i], OUTPUT);
+        digitalWrite(csPins[i], LOW); // select the display
+        tft.fillScreen(TFT_WHITE);
+        tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
+        digitalWrite(csPins[i], HIGH); // Deselect the display
+    }
 }
 
 void generateDalleImageRandomPrompt(void)
@@ -193,6 +208,8 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
+
+        digitalWrite(csPins[currentDisplay], LOW); // Select the display
         tft.startWrite();
         uint32_t dt = millis();
         res = png.decode(NULL, 0);
@@ -203,6 +220,8 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.print(millis() - dt);
         Serial.println("ms");
         tft.endWrite();
+        digitalWrite(csPins[currentDisplay], HIGH); // De-Select the display
+
         // png.close(); // not needed for memory->memory decode
     }
     else
