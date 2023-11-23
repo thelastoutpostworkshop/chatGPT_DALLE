@@ -41,40 +41,13 @@ void setup()
     tft.setRotation(2);
     tft.fillScreen(TFT_BLACK);
 
-    // Memory allocation in PSRAM
-    if (psramFound())
+    if (!allocatePsramMemory())
     {
-
-        Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
-
-        decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_DECODED_LENGTH);
-        if (decodedBase64Data == NULL)
+        while (true)
         {
-            Serial.println("Failed to allocate memory in PSRAM for image Buffer");
-            return;
-        }
-
-        if (!base64Data.reserve(PSRAM_BUFFER_READ_ENCODED_LENGTH))
-        {
-            Serial.println("Failed to allocate memory in PSRAM for deconding base64 Data");
-            return;
+            // Infinite loop, code execution useless without PSRAM
         }
     }
-    else
-    {
-        Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
-    }
-
-    // Web Test
-    // fetchBase64Image("192.168.1.90", 80, &base64Data);
-    // Serial.printf("Size of encoded data = %u\n", strlen(base64Data.c_str()));
-
-    // size_t length = base64::decodeLength(base64Data.c_str());
-    // base64::decode(base64Data.c_str(), decodedBase64Data);
-
-    // Serial.printf("base64 decoded length = %ld\n", length);
-
-    // displayPngFromRam(decodedBase64Data, length);
 
     testPngImage(resistance64Png);
     // delay(5000);
@@ -86,7 +59,8 @@ void loop()
     delay(1);
 }
 
-void generateDalleImageRandomPrompt(void) {
+void generateDalleImageRandomPrompt(void)
+{
     char *randomPrompt = prompts[myRandom(promptsCount)];
     genereteDalleImage(randomPrompt);
 }
@@ -230,6 +204,35 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
     }
 }
 
+// Memory allocation in PSRAM
+bool allocatePsramMemory(void)
+{
+    if (psramFound())
+    {
+
+        Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
+
+        decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_DECODED_LENGTH);
+        if (decodedBase64Data == NULL)
+        {
+            Serial.println("Failed to allocate memory in PSRAM for image Buffer");
+            return false;
+        }
+
+        if (!base64Data.reserve(PSRAM_BUFFER_READ_ENCODED_LENGTH))
+        {
+            Serial.println("Failed to allocate memory in PSRAM for deconding base64 Data");
+            return false;
+        }
+    }
+    else
+    {
+        Serial.println("No PSRAM detected, needed to perform reading and decoding large base64 encoded images");
+        return false;
+    }
+    return true;
+}
+
 void createTaskCore(void)
 {
     xTaskCreatePinnedToCore(
@@ -309,7 +312,8 @@ void printPngError(int errorCode)
     }
 }
 
-void testPngImage(const char* imageBase64Png) {
+void testPngImage(const char *imageBase64Png)
+{
     // Memory Test
     size_t length = base64::decodeLength(imageBase64Png);
     base64::decode(imageBase64Png, decodedBase64Data);
