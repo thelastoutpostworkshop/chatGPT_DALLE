@@ -3,6 +3,7 @@
 #include "WebServer.h"
 #include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
+#include "display.h"
 
 #include "base64_test_images\mandalaBase64Png.h"
 #include "base64_test_images\rainbowBase64Png.h"
@@ -33,15 +34,15 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 
 // Display
-#define ACTIVATE_CURRENT_DISPLAY() digitalWrite(csPins[currentDisplay], LOW)    // Macro to activate for write the current display
-#define DEACTIVATE_CURRENT_DISPLAY() digitalWrite(csPins[currentDisplay], HIGH) // Macro to de-activate for write the current display
-
-#define STORED_IMAGES_LENGTH 250000L             // Max size of image storage
-const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
-const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
-uint8_t *storedImages[NUM_DISPLAYS];             // Images stored for each screen
-bool hasImage[NUM_DISPLAYS];                // Indicate if the display has an image
+const int NUM_DISPLAYS = 4; // Adjust this value based on the number of displays
+Display display[NUM_DISPLAYS] = {
+    Display(15), // Assign a chip select pin for each display
+    Display(7),
+    Display(6),
+    Display(16)};
 int currentDisplay = 0;
+#define ACTIVATE_CURRENT_DISPLAY() digitalWrite(display[currentDisplay].csPin, LOW)    // Macro to activate for write the current display
+#define DEACTIVATE_CURRENT_DISPLAY() digitalWrite(display[currentDisplay].csPin, HIGH) // Macro to de-activate for write the current display
 TFT_eSPI tft = TFT_eSPI();
 
 // uint8_t output[50000L];
@@ -73,14 +74,7 @@ void setup()
 
     size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
     // size_t length = generateDalleImageRandomPrompt();
-    if (length > STORED_IMAGES_LENGTH)
-    {
-        Serial.printf("!!! Cannot store image, too large=%u\n", length);
-    }
-    else
-    {
-        memcpy(storedImages[currentDisplay], decodedBase64Data, length);
-    }
+    display[currentDisplay].storeImage(decodedBase64Data, length);
 
     // delay(5000);
     // generateDalleImageRandomPrompt();
@@ -96,18 +90,19 @@ bool initDisplay(void)
     tft.init();
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        pinMode(csPins[i], OUTPUT);
-        digitalWrite(csPins[i], LOW); // select the display
+        pinMode(display[i].csPin, OUTPUT);
+        digitalWrite(display[i].csPin, LOW); // select the display
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
-        digitalWrite(csPins[i], HIGH); // Deselect the display
-
-        storedImages[i] = (uint8_t *)ps_malloc(STORED_IMAGES_LENGTH);
-        if (storedImages[i] == NULL)
-        {
+        digitalWrite(display[i].csPin, HIGH); // Deselect the display
+    }
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        if(!display[i].hasImageStorage) {
             return false;
         }
     }
+
     return true;
 }
 
@@ -261,11 +256,15 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
     }
 }
 
-void changeDisplayTo(int displayIndex) {
-    if(displayIndex >= 0 && displayIndex < NUM_DISPLAYS) {
+void changeDisplayTo(int displayIndex)
+{
+    if (displayIndex >= 0 && displayIndex < NUM_DISPLAYS)
+    {
         currentDisplay = displayIndex;
-    } else {
-        Serial.printf("!!! Display index wrong = %d\n",displayIndex);
+    }
+    else
+    {
+        Serial.printf("!!! Display index wrong = %d\n", displayIndex);
     }
 }
 
