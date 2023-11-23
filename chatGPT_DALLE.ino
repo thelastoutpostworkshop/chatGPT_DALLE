@@ -36,10 +36,11 @@ PNG png; // PNG decoder instance
 #define ACTIVATE_CURRENT_DISPLAY() digitalWrite(csPins[currentDisplay], LOW)    // Macro to activate for write the current display
 #define DEACTIVATE_CURRENT_DISPLAY() digitalWrite(csPins[currentDisplay], HIGH) // Macro to de-activate for write the current display
 
-#define STORED_IMAGES_LENGTH 250000L              // Max size of image storage
+#define STORED_IMAGES_LENGTH 250000L             // Max size of image storage
 const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
 const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
 uint8_t *storedImages[NUM_DISPLAYS];             // Images stored for each screen
+bool hasImage[NUM_DISPLAYS];                // Indicate if the display has an image
 int currentDisplay = 0;
 TFT_eSPI tft = TFT_eSPI();
 
