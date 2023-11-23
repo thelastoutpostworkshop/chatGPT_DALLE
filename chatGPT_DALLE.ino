@@ -84,7 +84,7 @@ bool initDisplay(void)
     {
         pinMode(csPins[i], OUTPUT);
         digitalWrite(csPins[i], LOW); // select the display
-        tft.fillScreen(TFT_WHITE);
+        tft.fillScreen(TFT_BLACK);
         tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
         digitalWrite(csPins[i], HIGH); // Deselect the display
         if (!storedImages[i].reserve(STORED_IMAGES_LENGTH))
@@ -352,15 +352,16 @@ void printPngError(int errorCode)
     }
 }
 
-void testPngImage(const char *imageBase64Png)
+const char* testPngImage(const char *imageBase64Png)
 {
-    // Memory Test
     size_t length = base64::decodeLength(imageBase64Png);
+    Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
     base64::decode(imageBase64Png, decodedBase64Data);
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length);
+    return imageBase64Png;
 }
 
 long myRandom(long howbig)
