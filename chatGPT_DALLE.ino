@@ -57,7 +57,7 @@ void setup()
 
     if (!initDisplay())
     {
-        Serial.println("!!! Cannot allocate enoug PSRAM to store images");
+        Serial.println("!!! Cannot allocate enough PSRAM to store images");
         while (true)
         {
             // Infinite loop, code execution useless without PSRAM
@@ -98,11 +98,10 @@ bool initDisplay(void)
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        if(!display[i].hasImageStorage) {
+        if(!display[i].reserveMemoryForStorage()) {
             return false;
         }
     }
-
     return true;
 }
 

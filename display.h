@@ -6,17 +6,17 @@ public:
     int csPin;            // Chip Select pin
     uint8_t *storedImage; // Pointer to the stored image
     bool hasImage;        // Flag indicating if the display has an image
-    bool hasImageStorage; // Flag indicating if memory has been allocated to store an image
 
     // Constructor
     Display(int pin)
-        : csPin(pin), storedImage(nullptr), hasImage(false), hasImageStorage(false)
+        : csPin(pin), storedImage(NULL), hasImage(false)
+    {
+    }
+
+    bool reserveMemoryForStorage(void)
     {
         storedImage = (uint8_t *)ps_malloc(STORED_IMAGES_LENGTH);
-        if (storedImage != NULL)
-        {
-            hasImageStorage = true;
-        }
+        return storedImage != NULL;
     }
 
     void storeImage(uint8_t *image, size_t length)
