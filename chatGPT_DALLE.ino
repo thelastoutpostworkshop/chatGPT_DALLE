@@ -36,7 +36,7 @@ PNG png; // PNG decoder instance
 #define STORED_IMAGES_LENGTH 50000L              // Max size of image storage
 const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
 const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
-String storedImages[NUM_DISPLAYS];               // Images stored for each screen
+uint8_t *storedImages[NUM_DISPLAYS];             // Images stored for each screen
 int currentDisplay = 0;
 TFT_eSPI tft = TFT_eSPI();
 
@@ -83,11 +83,13 @@ bool initDisplay(void)
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         pinMode(csPins[i], OUTPUT);
-        digitalWrite(csPins[i], LOW); // select the display
+        digitalWrite(csPins[i], LOW);   // select the display
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
         digitalWrite(csPins[i], HIGH); // Deselect the display
-        if (!storedImages[i].reserve(STORED_IMAGES_LENGTH))
+
+        storedImages[i] = (uint8_t *)ps_malloc(STORED_IMAGES_LENGTH);
+        if (storedImages[i] == NULL)
         {
             return false;
         }
@@ -352,7 +354,7 @@ void printPngError(int errorCode)
     }
 }
 
-const char* testPngImage(const char *imageBase64Png)
+const char *testPngImage(const char *imageBase64Png)
 {
     size_t length = base64::decodeLength(imageBase64Png);
     Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
