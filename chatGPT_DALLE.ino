@@ -33,7 +33,7 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 
 // Display
-#define STORED_IMAGES_LENGTH 50000L              // Max size of image storage
+#define STORED_IMAGES_LENGTH 250000L              // Max size of image storage
 const int NUM_DISPLAYS = 4;                      // Adjust this value based on the number of displays
 const int csPins[NUM_DISPLAYS] = {15, 7, 6, 16}; // Chip Select pin for each display
 uint8_t *storedImages[NUM_DISPLAYS];             // Images stored for each screen
@@ -67,7 +67,8 @@ void setup()
         }
     }
 
-    size_t length = testPngImage(testImages[myRandom(promptsCount)]);
+    // size_t length = testPngImage(testImages[myRandom(promptsCount)]);
+    size_t length = generateDalleImageRandomPrompt();
     if (length > STORED_IMAGES_LENGTH)
     {
         Serial.printf("!!! Cannot store image, too large=%u\n", length);
@@ -106,13 +107,13 @@ bool initDisplay(void)
     return true;
 }
 
-void generateDalleImageRandomPrompt(void)
+size_t generateDalleImageRandomPrompt(void)
 {
     char *randomPrompt = prompts[myRandom(promptsCount)];
-    genereteDalleImage(randomPrompt);
+    return genereteDalleImage(randomPrompt);
 }
 
-void genereteDalleImage(char *prompt)
+size_t genereteDalleImage(char *prompt)
 {
     callOpenAIAPIDalle(&base64Data, prompt);
     size_t length = base64::decodeLength(base64Data.c_str());
@@ -121,6 +122,7 @@ void genereteDalleImage(char *prompt)
     Serial.printf("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length);
+    return length;
 }
 
 void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
