@@ -75,8 +75,8 @@ void setup()
     // size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
 
-    // delay(5000);
-    // generateDalleImageRandomPrompt();
+    delay(5000);
+    shiftImageOnDisplay(0,1);
 }
 
 void loop()
@@ -119,6 +119,10 @@ void shiftImageOnDisplay(int sourceDisplay, int destinationDisplay)
     if (display[sourceDisplay].imageSize() > 0)
     {
         display[destinationDisplay].storeImage(display[sourceDisplay].image(), display[sourceDisplay].imageSize());
+        displayPngFromRam(display[destinationDisplay].image(), display[destinationDisplay].imageSize(), destinationDisplay);
+        display[sourceDisplay].activate();
+        tft.fillScreen(TFT_BLACK);
+        display[sourceDisplay].deActivate();
     }
     else
     {
@@ -144,7 +148,7 @@ bool initDisplay(void)
     {
         display[i].activate();
         tft.fillScreen(TFT_BLACK);
-        tft.setRotation(2);                     // Adjust Rotation of your screen (0-3)
+        tft.setRotation(2); // Adjust Rotation of your screen (0-3)
         display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
@@ -290,7 +294,7 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
         Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
-        display[currentDisplay].activate();
+        display[screenIndex].activate();
         tft.startWrite();
         uint32_t dt = millis();
         res = png.decode(NULL, 0);
@@ -301,7 +305,7 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
         Serial.print(millis() - dt);
         Serial.println("ms");
         tft.endWrite();
-        display[currentDisplay].deActivate();
+        display[screenIndex].deActivate();
 
         // png.close(); // not needed for memory->memory decode
     }
