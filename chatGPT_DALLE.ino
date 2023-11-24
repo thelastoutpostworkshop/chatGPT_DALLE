@@ -87,23 +87,26 @@ void setup()
 
 void loop()
 {
-    if (generationSwitch.read())
-    {
-        runImageGeneration = !runImageGeneration;
-        if (runImageGeneration)
-        {
-            Serial.println("Image generation started...");
-        }
-        else
-        {
-            Serial.println("Image generation stopped");
-        }
-    }
     if (runImageGeneration)
     {
         generateAIImages();
     }
     delay(1);
+}
+
+void generationSwitchTask(void *parameter)
+{
+    for (;;) { // Task loop
+        if (generationSwitch.read()) {
+            runImageGeneration = !runImageGeneration;
+            if (runImageGeneration) {
+                Serial.println("Image generation started...");
+            } else {
+                Serial.println("Image generation stopped");
+            }
+        }
+        vTaskDelay(50 / portTICK_PERIOD_MS); // Delay to prevent task from running too frequently
+    }
 }
 
 void generateAIImages(void)
@@ -415,6 +418,14 @@ void createTaskCore(void)
         1,                    /* Priority of the task */
         NULL,                 /* Task handle. */
         1);                   /* Core where the task should run */
+    xTaskCreatePinnedToCore(
+        generationSwitchTask,   /* Function to implement the task */
+        "generationSwitchTask", /* Name of the task */
+        10000,                  /* Stack size in words */
+        NULL,                   /* Task input parameter */
+        1,                      /* Priority of the task */
+        NULL,                   /* Task handle. */
+        1);                     /* Core where the task should run */
 }
 
 // Task for the web browser
