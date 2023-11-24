@@ -5,11 +5,12 @@ class Display
 public:
     int csPin;            // Chip Select pin
     uint8_t *storedImage; // Pointer to the stored image
-    bool hasImage;        // Flag indicating if the display has an image
+    size_t size;        // Size of image, length = 0 indicate no image
+
 
     // Constructor
     Display(int pin)
-        : csPin(pin), storedImage(NULL), hasImage(false)
+        : csPin(pin), storedImage(NULL), size(0)
     {
     }
 
@@ -24,10 +25,12 @@ public:
         if (length > STORED_IMAGES_LENGTH)
         {
             Serial.printf("!!! Cannot store image, too large=%u\n", length);
+            size = 0;
         }
         else
         {
             memcpy(storedImage, image, length);
+            size = length;
         }
     }
     void activate(void)
@@ -39,11 +42,11 @@ public:
         digitalWrite(csPin, HIGH);
     }
 
-    void setStoredImage(uint8_t* image) {
-        storedImage = image;
+    size_t imageSize() const {
+        return size;
     }
 
-    uint8_t* getStoredImage() const {
+    uint8_t* storedImage() const {
         return storedImage;
     }
 };

@@ -87,7 +87,10 @@ void loop()
 void shifImagesOnDisplayLeft(void) {
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        /* code */
+        int nextDisplay = i+1;
+        if(nextDisplay < NUM_DISPLAYS) {
+            display[nextDisplay]
+        }
     }
     
 }
