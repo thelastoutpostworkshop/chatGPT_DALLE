@@ -5,11 +5,19 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 
+#define SIMULE_CALL_DALLE // Comment this line to make the real call to the DALLE API
+
+#ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
 #include "base64_test_images\rainbowBase64Png.h"
 #include "base64_test_images\resistance.h"
 #include "base64_test_images\spaceship.h"
 #include "base64_test_images\hal.h"
+
+// Test PNG Images
+const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png, hal64Png};
+const int testImagesCount = 4;
+#endif
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -23,10 +31,6 @@ const char *endToken = "\"";
 // Prompts
 char *prompts[] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene", "An empire spaceship attacking"};
 int promptsCount = 4;
-
-// Test PNG Images
-const char *testImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png, hal64Png};
-const int testImagesCount = 4;
 
 int16_t xpos = 0;
 int16_t ypos = 0;
@@ -71,17 +75,31 @@ void setup()
         }
     }
 
-    size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
-    // size_t length = generateDalleImageRandomPrompt();
-    display[currentDisplay].storeImage(decodedBase64Data, length);
+    // size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
+    // // size_t length = generateDalleImageRandomPrompt();
+    // display[currentDisplay].storeImage(decodedBase64Data, length);
 
-    delay(5000);
-    shifImagesOnDisplayLeft();
+    // delay(5000);
+    // shifImagesOnDisplayLeft();
 }
 
 void loop()
 {
     delay(1);
+}
+
+void generateAIImages(void)
+{
+    while (true)
+    {
+#ifdef SIMULE_CALL_DALLE
+        delay(5000); // Delay for simulation
+        const char *image = testPngImages[myRandom(testImagesCount)];
+        size_t length = testPngImage(image);
+        display[currentDisplay].storeImage(decodedBase64Data, length);
+#else
+#endif
+    }
 }
 
 void shifImagesOnDisplayLeft(void)
