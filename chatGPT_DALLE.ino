@@ -79,8 +79,7 @@ void setup()
     // size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
 
-    delay(5000);
-    shifImagesOnDisplayLeft();
+    generateAIImages();
 }
 
 void loop()
@@ -97,6 +96,8 @@ void generateAIImages(void)
         const char *image = testPngImages[myRandom(testImagesCount)];
         size_t length = testPngImage(image);
         display[currentDisplay].storeImage(decodedBase64Data, length);
+        delay(5000); // Delay for simulation
+        shifImagesOnDisplayLeft();
 #else
 #endif
     }
@@ -111,7 +112,7 @@ void shifImagesOnDisplayLeft(void)
         {
             return;
         }
-        switchImageOnDisplay(displaySource,i);
+        switchImageOnDisplay(displaySource, i);
     }
 
     // for (int i = 0; i < NUM_DISPLAYS; i++)
