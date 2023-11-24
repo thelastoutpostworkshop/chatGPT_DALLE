@@ -5,7 +5,7 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 
-#define SIMULE_CALL_DALLE // Comment this line to make the real call to the DALLE API
+#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 
 #ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
@@ -75,9 +75,9 @@ void setup()
         }
     }
 
-    size_t length = testPngImage(testPngImages[myRandom(testImagesCount)]);
-    // size_t length = generateDalleImageRandomPrompt();
-    display[currentDisplay].storeImage(decodedBase64Data, length);
+    // size_t length = testPngImage(testPngImages[myRandom(testImagesCount)]);
+    // // size_t length = generateDalleImageRandomPrompt();
+    // display[currentDisplay].storeImage(decodedBase64Data, length);
 
     generateAIImages();
 }
