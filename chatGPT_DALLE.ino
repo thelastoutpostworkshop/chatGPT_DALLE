@@ -19,6 +19,8 @@ const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png
 const int testImagesCount = 4;
 #endif
 
+#define GENERATION_SWITCH_PIN 1
+
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
 #define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Length of buffer for reading the base64 encoded data in PSRAM
@@ -55,6 +57,7 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
+    initSwith();
     initWebServer();
     createTaskCore();
 
@@ -79,12 +82,19 @@ void setup()
     // // size_t length = generateDalleImageRandomPrompt();
     // display[currentDisplay].storeImage(decodedBase64Data, length);
 
-    generateAIImages();
+    // generateAIImages();
 }
 
 void loop()
 {
     delay(1);
+    int v = digitalRead(GENERATION_SWITCH_PIN);
+    Serial.println(v);
+}
+
+void initSwith(void)
+{
+    pinMode(GENERATION_SWITCH_PIN, INPUT_PULLUP);
 }
 
 void generateAIImages(void)
