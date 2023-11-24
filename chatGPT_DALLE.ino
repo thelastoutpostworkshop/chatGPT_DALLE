@@ -76,7 +76,7 @@ void setup()
     display[currentDisplay].storeImage(decodedBase64Data, length);
 
     delay(5000);
-    shiftImageOnDisplay(0,1);
+    shifImagesOnDisplayLeft();
 }
 
 void loop()
