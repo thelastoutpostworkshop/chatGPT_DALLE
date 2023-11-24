@@ -84,15 +84,57 @@ void loop()
     delay(1);
 }
 
-void shifImagesOnDisplayLeft(void) {
+void shifImagesOnDisplayLeft(void)
+{
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        int nextDisplay = i+1;
-        if(nextDisplay < NUM_DISPLAYS) {
-            display[nextDisplay]
+        int nextDisplay = i + 1;
+        if (nextDisplay < NUM_DISPLAYS)
+        {
+            shiftImageOnDisplay(i, nextDisplay);
         }
     }
-    
+}
+
+void shiftImageOnDisplay(int sourceDisplay, int destinationDisplay)
+{
+    if (sourceDisplay == destinationDisplay)
+    {
+        Serial.printf("!!! Source and destination display are the same (%d)\n", sourceDisplay);
+        return;
+    }
+
+    if (!verifyScreenIndex(sourceDisplay))
+    {
+        Serial.printf("!!! Source display is out of bound (%d)\n", sourceDisplay);
+        return;
+    }
+
+    if (!verifyScreenIndex(destinationDisplay))
+    {
+        Serial.printf("!!! Destination display is out of bound (%d)\n", destinationDisplay);
+        return;
+    }
+
+    if (display[sourceDisplay].imageSize() > 0)
+    {
+        display[destinationDisplay].storeImage(display[sourceDisplay].image(), display[sourceDisplay].imageSize());
+    }
+    else
+    {
+        display[destinationDisplay].activate();
+        tft.fillScreen(TFT_BLACK);
+        display[destinationDisplay].deActivate();
+    }
+}
+
+bool verifyScreenIndex(int screenIndex)
+{
+    if (screenIndex < 0 || screenIndex >= NUM_DISPLAYS)
+    {
+        return false;
+    }
+    return true;
 }
 
 bool initDisplay(void)
@@ -100,15 +142,16 @@ bool initDisplay(void)
     tft.init();
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        pinMode(display[i].csPin, OUTPUT);
-        digitalWrite(display[i].csPin, LOW); // select the display
+        pinMode(display[i].chipSelectPin(), OUTPUT);
+        digitalWrite(display[i].chipSelectPin(), LOW); // select the display
         tft.fillScreen(TFT_BLACK);
-        tft.setRotation(2);            // Adjust Rotation of your screen (0-3)
-        digitalWrite(display[i].csPin, HIGH); // Deselect the display
+        tft.setRotation(2);                     // Adjust Rotation of your screen (0-3)
+        digitalWrite(display[i].chipSelectPin(), HIGH); // Deselect the display
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        if(!display[i].reserveMemoryForStorage()) {
+        if (!display[i].reserveMemoryForStorage())
+        {
             return false;
         }
     }
@@ -129,7 +172,7 @@ size_t genereteDalleImage(char *prompt)
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
-    displayPngFromRam(decodedBase64Data, length);
+    displayPngFromRam(decodedBase64Data, length, currentDisplay);
     return length;
 }
 
@@ -234,8 +277,13 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     Serial.println("Request call completed");
 }
 
-void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
+void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int screenIndex)
 {
+    if (!verifyScreenIndex(screenIndex))
+    {
+        Serial.printf("!!! displayPngFromRam Screen index is out of bound (%d)\n", screenIndex);
+        return;
+    }
     int res = png.openRAM((uint8_t *)pngImageinC, length, pngDraw);
     if (res == PNG_SUCCESS)
     {
@@ -243,7 +291,6 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length)
         Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
-
         display[currentDisplay].activate();
         tft.startWrite();
         uint32_t dt = millis();
@@ -393,7 +440,7 @@ size_t testPngImage(const char *imageBase64Png)
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
-    displayPngFromRam(decodedBase64Data, length);
+    displayPngFromRam(decodedBase64Data, length, currentDisplay);
     return length;
 }
 

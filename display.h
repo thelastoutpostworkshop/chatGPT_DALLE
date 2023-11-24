@@ -2,12 +2,12 @@
 
 class Display
 {
-public:
+private:
     int csPin;            // Chip Select pin
     uint8_t *storedImage; // Pointer to the stored image
-    size_t size;        // Size of image, length = 0 indicate no image
+    size_t size;          // Size of image, length = 0 indicate no image
 
-
+public:
     // Constructor
     Display(int pin)
         : csPin(pin), storedImage(NULL), size(0)
@@ -42,11 +42,17 @@ public:
         digitalWrite(csPin, HIGH);
     }
 
-    size_t imageSize() const {
+    size_t imageSize() const
+    {
         return size;
     }
 
-    uint8_t* storedImage() const {
+    uint8_t *image() const
+    {
         return storedImage;
+    }
+
+    int chipSelectPin() const {
+        return csPin;
     }
 };
