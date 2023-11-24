@@ -33,7 +33,7 @@ int16_t ypos = 0;
 
 PNG png; // PNG decoder instance
 
-// Display
+// Display - You must disable chip select pin definitions in the user_setup.h and the driver setup (ex.: Setup46_GC9A01_ESP32.h)
 const int NUM_DISPLAYS = 4; // Adjust this value based on the number of displays
 Display display[NUM_DISPLAYS] = {
     Display(15), // Assign a chip select pin for each display
@@ -71,6 +71,7 @@ void setup()
         }
     }
 
+    currentDisplay = 2;
     size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
     // size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
