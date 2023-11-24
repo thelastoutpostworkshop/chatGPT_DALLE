@@ -22,6 +22,7 @@ const int testImagesCount = 4;
 
 // Switch
 SwitchReader generationSwitch(1);
+bool generationRunning = false;   // Flag to indicate if generation of images is running or stopped
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
