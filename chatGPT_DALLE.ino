@@ -4,6 +4,7 @@
 #include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
 #include "display.h"
+#include "switch.h"
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 
@@ -19,7 +20,8 @@ const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png
 const int testImagesCount = 4;
 #endif
 
-#define GENERATION_SWITCH_PIN 1
+// Switch
+SwitchReader generationSwitch(1);
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -57,7 +59,6 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
-    initSwith();
     initWebServer();
     createTaskCore();
 
@@ -88,13 +89,10 @@ void setup()
 void loop()
 {
     delay(1);
-    int v = digitalRead(GENERATION_SWITCH_PIN);
-    Serial.println(v);
-}
-
-void initSwith(void)
-{
-    pinMode(GENERATION_SWITCH_PIN, INPUT_PULLUP);
+    if (generationSwitch.read())
+    {
+        Serial.println("Button pressed");
+    }
 }
 
 void generateAIImages(void)
