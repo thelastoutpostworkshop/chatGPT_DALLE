@@ -99,6 +99,10 @@ void generateAIImages(void)
         delay(5000); // Delay for simulation
         shifImagesOnDisplayLeft();
 #else
+        size_t length = generateDalleImageRandomPrompt();
+        display[currentDisplay].storeImage(decodedBase64Data, length);
+        delay(5000);
+        shifImagesOnDisplayLeft();
 #endif
     }
 }
