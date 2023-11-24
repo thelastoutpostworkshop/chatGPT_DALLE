@@ -71,7 +71,6 @@ void setup()
         }
     }
 
-    currentDisplay = 2;
     size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
     // size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
@@ -83,6 +82,14 @@ void setup()
 void loop()
 {
     delay(1);
+}
+
+void shifImagesOnDisplayLeft(void) {
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        /* code */
+    }
+    
 }
 
 bool initDisplay(void)

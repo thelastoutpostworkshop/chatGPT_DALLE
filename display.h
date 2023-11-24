@@ -38,4 +38,12 @@ public:
     {
         digitalWrite(csPin, HIGH);
     }
+
+    void setStoredImage(uint8_t* image) {
+        storedImage = image;
+    }
+
+    uint8_t* getStoredImage() const {
+        return storedImage;
+    }
 };
