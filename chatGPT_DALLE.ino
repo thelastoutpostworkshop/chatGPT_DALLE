@@ -75,12 +75,12 @@ void setup()
         }
     }
 
-    // size_t length = testPngImage(testImages[myRandom(testImagesCount)]);
-    // // size_t length = generateDalleImageRandomPrompt();
-    // display[currentDisplay].storeImage(decodedBase64Data, length);
+    size_t length = testPngImage(testPngImages[myRandom(testImagesCount)]);
+    // size_t length = generateDalleImageRandomPrompt();
+    display[currentDisplay].storeImage(decodedBase64Data, length);
 
-    // delay(5000);
-    // shifImagesOnDisplayLeft();
+    delay(5000);
+    shifImagesOnDisplayLeft();
 }
 
 void loop()
@@ -104,17 +104,27 @@ void generateAIImages(void)
 
 void shifImagesOnDisplayLeft(void)
 {
-    for (int i = 0; i < NUM_DISPLAYS; i++)
+    for (int i = NUM_DISPLAYS - 1; i >= 0; i--)
     {
-        int nextDisplay = i + 1;
-        if (nextDisplay < NUM_DISPLAYS)
+        int displaySource = i - 1;
+        if (i == 0)
         {
-            shiftImageOnDisplay(i, nextDisplay);
+            return;
         }
+        switchImageOnDisplay(displaySource,i);
     }
+
+    // for (int i = 0; i < NUM_DISPLAYS; i++)
+    // {
+    //     int nextDisplay = i + 1;
+    //     if (nextDisplay < NUM_DISPLAYS)
+    //     {
+    //         shiftImageOnDisplay(i, nextDisplay);
+    //     }
+    // }
 }
 
-void shiftImageOnDisplay(int sourceDisplay, int destinationDisplay)
+void switchImageOnDisplay(int sourceDisplay, int destinationDisplay)
 {
     if (sourceDisplay == destinationDisplay)
     {
