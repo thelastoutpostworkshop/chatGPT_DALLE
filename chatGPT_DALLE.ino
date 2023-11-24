@@ -22,7 +22,7 @@ const int testImagesCount = 4;
 
 // Switch
 SwitchReader generationSwitch(1);
-bool generationRunning = false;   // Flag to indicate if generation of images is running or stopped
+bool runImageGeneration = false; // Flag to indicate if generation of images is running or stopped
 
 #define MAX_IMAGE_WIDTH 1024                      // Adjust for your images
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
@@ -83,37 +83,44 @@ void setup()
     // size_t length = testPngImage(testPngImages[myRandom(testImagesCount)]);
     // // size_t length = generateDalleImageRandomPrompt();
     // display[currentDisplay].storeImage(decodedBase64Data, length);
-
-    // generateAIImages();
 }
 
 void loop()
 {
-    delay(1);
     if (generationSwitch.read())
     {
-        Serial.println("Button pressed");
+        runImageGeneration = !runImageGeneration;
+        if (runImageGeneration)
+        {
+            Serial.println("Image generation started...");
+        }
+        else
+        {
+            Serial.println("Image generation stopped");
+        }
     }
+    if (runImageGeneration)
+    {
+        generateAIImages();
+    }
+    delay(1);
 }
 
 void generateAIImages(void)
 {
-    while (true)
-    {
 #ifdef SIMULE_CALL_DALLE
-        delay(5000); // Delay for simulation
-        const char *image = testPngImages[myRandom(testImagesCount)];
-        size_t length = testPngImage(image);
-        display[currentDisplay].storeImage(decodedBase64Data, length);
-        delay(5000); // Delay for simulation
-        shifImagesOnDisplayLeft();
+    delay(5000); // Delay for simulation
+    const char *image = testPngImages[myRandom(testImagesCount)];
+    size_t length = testPngImage(image);
+    display[currentDisplay].storeImage(decodedBase64Data, length);
+    delay(5000); // Delay for simulation
+    shifImagesOnDisplayLeft();
 #else
-        size_t length = generateDalleImageRandomPrompt();
-        display[currentDisplay].storeImage(decodedBase64Data, length);
-        delay(5000);
-        shifImagesOnDisplayLeft();
+    size_t length = generateDalleImageRandomPrompt();
+    display[currentDisplay].storeImage(decodedBase64Data, length);
+    delay(5000);
+    shifImagesOnDisplayLeft();
 #endif
-    }
 }
 
 void shifImagesOnDisplayLeft(void)
