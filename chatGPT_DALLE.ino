@@ -142,11 +142,10 @@ bool initDisplay(void)
     tft.init();
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        pinMode(display[i].chipSelectPin(), OUTPUT);
-        digitalWrite(display[i].chipSelectPin(), LOW); // select the display
+        display[i].activate();
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2);                     // Adjust Rotation of your screen (0-3)
-        digitalWrite(display[i].chipSelectPin(), HIGH); // Deselect the display
+        display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {

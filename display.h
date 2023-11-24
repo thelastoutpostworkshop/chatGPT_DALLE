@@ -12,6 +12,7 @@ public:
     Display(int pin)
         : csPin(pin), storedImage(NULL), size(0)
     {
+        pinMode(csPin, OUTPUT);
     }
 
     bool reserveMemoryForStorage(void)
@@ -50,9 +51,5 @@ public:
     uint8_t *image() const
     {
         return storedImage;
-    }
-
-    int chipSelectPin() const {
-        return csPin;
     }
 };
