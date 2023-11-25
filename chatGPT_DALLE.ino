@@ -11,6 +11,7 @@
 #include "ai.h" // Animated GIF
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+// #define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor
 
 #ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD       // Comment this line if you don't have an SD Card module
@@ -572,10 +573,12 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
     int res = png.openRAM((uint8_t *)pngImageinC, length, pngDraw);
     if (res == PNG_SUCCESS)
     {
+        #ifdef DEBUG_ON
         Serial.println("Successfully opened png file");
         Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
+        #endif
         display[screenIndex].activate();
         tft.startWrite();
         uint32_t dt = millis();
