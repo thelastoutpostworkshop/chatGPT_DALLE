@@ -1,5 +1,6 @@
-#include <PNGdec.h>
-#include <TFT_eSPI.h>
+#include <PNGdec.h>       // Install this library with the Arduino IDE Library Manager
+#include <TFT_eSPI.h>     // Install this library with the Arduino IDE Library Manager
+#include <AnimatedGIF.h>  // Install this library with the Arduino IDE Library Manager
 #include <SD.h>
 #include "WebServer.h"
 #include <WiFiClientSecure.h>
