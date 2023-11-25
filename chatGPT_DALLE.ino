@@ -34,7 +34,6 @@ int idForNewFile = 1;
 
 #define GIF_IMAGE ai
 AnimatedGIF gif;
-TaskHandle_t taskPlayAIGif = NULL; // Task to suspend and resume the AI animated GIF
 
 // Switch
 SwitchReader generationSwitch(1);
@@ -125,11 +124,7 @@ void loop()
 
 void playAIGif(void *parameter)
 {
-    for (;;)
-    {
-        gif.playFrame(true, NULL);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
-    }
+    gif.playFrame(true, NULL);
 }
 
 void startPlayAIGif(void)
@@ -137,12 +132,10 @@ void startPlayAIGif(void)
     gif.open((uint8_t *)GIF_IMAGE, sizeof(GIF_IMAGE), GIFDraw);
     display[0].activate();
     tft.startWrite();
-    vTaskResume(taskPlayAIGif);
 }
 
 void stopPlayAIGif(void)
 {
-    vTaskSuspend(taskPlayAIGif);
     gif.close();
     tft.endWrite();
     display[0].deActivate();
@@ -654,14 +647,6 @@ void createTaskCore(void)
         1,                      /* Priority of the task */
         NULL,                   /* Task handle. */
         1);                     /* Core where the task should run */
-    xTaskCreate(
-        playAIGif,     // Task function
-        "My Task",     // Name of task
-        2048,          // Stack size (adjust as needed)
-        NULL,          // Parameter to pass
-        1,             // Task priority
-        &taskPlayAIGif // Task handle
-    );
 }
 
 // Task for the web browser
