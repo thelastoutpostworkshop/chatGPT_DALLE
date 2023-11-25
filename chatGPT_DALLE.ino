@@ -1,14 +1,14 @@
 #include <PNGdec.h>
 #include <TFT_eSPI.h>
-#include <SD.h>       
+#include <SD.h>
 #include "WebServer.h"
 #include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
 
-#define SIMULE_CALL_DALLE   // Uncomment this line to make the real call to the DALLE API
-#define USE_SD_CARD         // Comment this line if you don't have an SD Card module
+#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+#define USE_SD_CARD       // Comment this line if you don't have an SD Card module
 
 #ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
@@ -23,7 +23,7 @@ const int testImagesCount = 4;
 #endif
 
 #ifdef USE_SD_CARD
-#define SD_CARD_CS_PIN 9    // Chip Select Pin for the SD Card Module
+#define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
 #endif
 
 // Switch
@@ -87,13 +87,11 @@ void setup()
     }
 
 #ifdef USE_SD_CARD
-    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
-    // Initialize SD card
-    if (!SD.begin(SD_CARD_CS_PIN,tft.getSPIinstance())) {
-        Serial.println("SD Card initialization failed!");
-    } else {
-        Serial.println("SD Card initialization success");
-    }
+    if (!initSDCard())
+        while (true)
+        {
+            // Infinite loop, code execution useless without PSRAM
+        }
 #endif
 }
 
@@ -106,14 +104,63 @@ void loop()
     delay(1);
 }
 
+bool initSDCard(void)
+{
+    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
+    // Initialize SD card
+    if (!SD.begin(SD_CARD_CS_PIN, tft.getSPIinstance()))
+    {
+        Serial.println("SD Card initialization failed!");
+        return false;
+    }
+    else
+    {
+        Serial.println("SD Card initialization success");
+    }
+    uint8_t cardType = SD.cardType();
+
+    if (cardType == CARD_NONE)
+    {
+        Serial.println("No SD card attached");
+        return false;
+    }
+
+    Serial.print("SD Card Type: ");
+    if (cardType == CARD_MMC)
+    {
+        Serial.println("MMC");
+    }
+    else if (cardType == CARD_SD)
+    {
+        Serial.println("SDSC");
+    }
+    else if (cardType == CARD_SDHC)
+    {
+        Serial.println("SDHC");
+    }
+    else
+    {
+        Serial.println("UNKNOWN");
+    }
+
+    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+    Serial.printf("SD Card Size: %lluMB\n", cardSize);
+    return true;
+}
+
 void generationSwitchTask(void *parameter)
 {
-    for (;;) { // Task loop
-        if (generationSwitch.read()) {
+    for (;;)
+    { // Task loop
+        if (generationSwitch.read())
+        {
             runImageGeneration = !runImageGeneration;
-            if (runImageGeneration) {
+            if (runImageGeneration)
+            {
                 Serial.println("Image generation started...");
-            } else {
+            }
+            else
+            {
                 Serial.println("Image generation stopped");
             }
         }
@@ -214,7 +261,7 @@ bool initDisplay(void)
         display[i].activate();
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2); // Adjust Rotation of your screen (0-3)
-        tft.setCursor(40,120);
+        tft.setCursor(40, 120);
         tft.print("Ready!");
         display[i].deActivate();
     }
