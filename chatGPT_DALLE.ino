@@ -8,10 +8,10 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
-#include "ai.h"           // Animated GIF
+#include "ai.h" // Animated GIF
 
-// #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
-#define USE_SD_CARD // Comment this line if you don't have an SD Card module
+#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+#define USE_SD_CARD       // Comment this line if you don't have an SD Card module
 
 #ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
@@ -34,6 +34,7 @@ int idForNewFile = 1;
 
 #define GIF_IMAGE ai
 AnimatedGIF gif;
+TaskHandle_t taskPlayAIGif = NULL; // Task to suspend and resume the AI animated GIF
 
 // Switch
 SwitchReader generationSwitch(1);
@@ -116,26 +117,35 @@ void setup()
 
 void loop()
 {
-    if (gif.open((uint8_t *)GIF_IMAGE, sizeof(GIF_IMAGE), GIFDraw))
+    if (runImageGeneration)
     {
-        Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
-        display[0].activate();
-
-        tft.startWrite();
-        while (gif.playFrame(true, NULL))
-        {
-            yield();
-        }
-        gif.close();
-        tft.endWrite();
-        display[0].deActivate();
+        generateAIImages();
     }
+}
 
-    // if (runImageGeneration)
-    // {
-    //     generateAIImages();
-    // }
-    // delay(1);
+void playAIGif(void *parameter)
+{
+    for (;;)
+    {
+        gif.playFrame(true, NULL);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void startPlayAIGif(void)
+{
+    gif.open((uint8_t *)GIF_IMAGE, sizeof(GIF_IMAGE), GIFDraw);
+    display[0].activate();
+    tft.startWrite();
+    vTaskResume(taskPlayAIGif);
+}
+
+void stopPlayAIGif(void)
+{
+    vTaskSuspend(taskPlayAIGif);
+    gif.close();
+    tft.endWrite();
+    display[0].deActivate();
 }
 
 bool initSDCard(void)
@@ -319,9 +329,11 @@ void generationSwitchTask(void *parameter)
 void generateAIImages(void)
 {
 #ifdef SIMULE_CALL_DALLE
+    startPlayAIGif();
     delay(5000); // Delay for simulation
+    stopPlayAIGif();
     const char *image = testPngImages[myRandom(testImagesCount)];
-    size_t length = testPngImage(image);
+    size_t length = displayTestPngImage(image);
     display[currentDisplay].storeImage(decodedBase64Data, length);
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
@@ -642,6 +654,14 @@ void createTaskCore(void)
         1,                      /* Priority of the task */
         NULL,                   /* Task handle. */
         1);                     /* Core where the task should run */
+    xTaskCreate(
+        playAIGif,     // Task function
+        "My Task",     // Name of task
+        2048,          // Stack size (adjust as needed)
+        NULL,          // Parameter to pass
+        1,             // Task priority
+        &taskPlayAIGif // Task handle
+    );
 }
 
 // Task for the web browser
@@ -711,7 +731,7 @@ void printPngError(int errorCode)
     }
 }
 
-size_t testPngImage(const char *imageBase64Png)
+size_t displayTestPngImage(const char *imageBase64Png)
 {
     size_t length = base64::decodeLength(imageBase64Png);
     Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
