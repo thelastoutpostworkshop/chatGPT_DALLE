@@ -209,7 +209,7 @@ bool initDisplay(void)
         display[i].activate();
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2); // Adjust Rotation of your screen (0-3)
-        tft.setCursor(30,120);
+        tft.setCursor(40,120);
         tft.print("Ready!");
         display[i].deActivate();
     }
