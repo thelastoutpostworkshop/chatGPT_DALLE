@@ -8,10 +8,10 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
-#include "images\ai.h"          // AI Animated GIF
-#include "images\readyPng.h"    // Ready PNG
+#include "images\ai.h"       // AI Animated GIF
+#include "images\readyPng.h" // Ready PNG
 
-#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+// #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor
 
 #ifndef SIMULE_CALL_DALLE
@@ -336,7 +336,7 @@ void generateAIImages(void)
     }
     stopPlayAIGif();
     const char *image = testPngImages[myRandom(testImagesCount)];
-    size_t length = displayPngImage(image,0);
+    size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
@@ -453,7 +453,7 @@ size_t generateDalleImageRandomPrompt(void)
 size_t genereteDalleImage(char *prompt)
 {
     callOpenAIAPIDalle(&base64Data, prompt);
-    size_t length = displayPngImage(base64Data.c_str(),0);
+    size_t length = displayPngImage(base64Data.c_str(), 0);
 
     return length;
 }
@@ -488,7 +488,9 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
     client.print(request);
 
+#ifdef DEBUG_ON
     Serial.printf("Request sent with prompt : %s\n", prompt);
+#endif
 
     while (client.connected())
     {
@@ -496,7 +498,9 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
         // Serial.println(line);
         if (line == "\r")
         {
+#ifdef DEBUG_ON
             Serial.println("headers received");
+#endif
             break;
         }
     }
@@ -510,8 +514,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     while (client.available() && !base64EndFound)
     {
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
-        buffer[bufferLength] = '\0'; // Null-terminate the buffer
-        // Serial.println(buffer);
+        buffer[bufferLength] = '\0'; 
         if (!base64StartFound)
         {
             char *base64Start = strstr(buffer, startToken);
@@ -553,10 +556,12 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     client.stop();
     if (!base64StartFound)
     {
-        Serial.println("No Json Base64 data in Response:");
+        Serial.println("!!! No Json Base64 data in Response:");
         Serial.println(buffer);
     }
+    #ifdef DEBUG_ON
     Serial.println("Request call completed");
+    #endif
 }
 
 void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int screenIndex)
@@ -716,7 +721,7 @@ void printPngError(int errorCode)
     }
 }
 
-size_t displayPngImage(const char *imageBase64Png,int displayIndex)
+size_t displayPngImage(const char *imageBase64Png, int displayIndex)
 {
     size_t length = base64::decodeLength(imageBase64Png);
     base64::decode(imageBase64Png, decodedBase64Data);
