@@ -262,7 +262,7 @@ void generationSwitchTask(void *parameter)
             runImageGeneration = !runImageGeneration;
             if (runImageGeneration)
             {
-                Serial.println("Image generation started...");
+                Serial.println("Image generation starting...");
             }
             else
             {
@@ -286,7 +286,7 @@ void generateAIImages(void)
     size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
 #ifdef USE_SD_CARD
-    String filename = "/" + String(idForNewFile) + ".png";
+    String filename = "/images/" + String(idForNewFile) + ".png";
     idForNewFile += 1;
     writeFile(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
