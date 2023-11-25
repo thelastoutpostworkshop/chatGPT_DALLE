@@ -25,7 +25,7 @@ const int testImagesCount = 4;
 #ifdef USE_SD_CARD
 #define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
 const char* ID_FILENAME = "id.txt";
-const char* IMAGES_FOLDER_NAME = "images";
+const char* IMAGES_FOLDER_NAME = "/images";
 int idForNewFile = 1;
 #endif
 
@@ -118,7 +118,7 @@ void loop()
 
 bool initSDCard(void)
 {
-    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
+    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display 
     // Initialize SD card
     if (!SD.begin(SD_CARD_CS_PIN))
     {
@@ -307,7 +307,7 @@ void generateAIImages(void)
     size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
 #ifdef USE_SD_CARD
-    String filename = "/"+String(IMAGES_FOLDER_NAME)+"/" + String(idForNewFile) + ".png";
+    String filename = String(IMAGES_FOLDER_NAME)+"/" + String(idForNewFile) + ".png";
     idForNewFile += 1;
     writeImage(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
