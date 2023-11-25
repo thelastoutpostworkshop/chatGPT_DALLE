@@ -203,11 +203,14 @@ bool verifyScreenIndex(int screenIndex)
 bool initDisplay(void)
 {
     tft.init();
+    tft.setFreeFont(&FreeMono24pt7b);
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         display[i].activate();
-        tft.fillScreen(TFT_WHITE);
+        tft.fillScreen(TFT_BLACK);
         tft.setRotation(2); // Adjust Rotation of your screen (0-3)
+        tft.setCursor(30,120);
+        tft.print("Ready!");
         display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
