@@ -14,7 +14,7 @@
 // #define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor
 
 #ifndef SIMULE_CALL_DALLE
-#define USE_SD_CARD       // Comment this line if you don't have an SD Card module
+#define USE_SD_CARD // Comment this line if you don't have an SD Card module
 #endif
 
 #ifdef SIMULE_CALL_DALLE
@@ -305,7 +305,6 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
 }
 #endif
 
-
 void generationSwitchTask(void *parameter)
 {
     for (;;)
@@ -331,7 +330,8 @@ void generateAIImages(void)
 #ifdef SIMULE_CALL_DALLE
     startPlayAIGif();
     unsigned long t = millis();
-    while(millis()-t < 5000) {
+    while (millis() - t < 5000)
+    {
         playAIGif();
     }
     stopPlayAIGif();
@@ -573,12 +573,12 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
     int res = png.openRAM((uint8_t *)pngImageinC, length, pngDraw);
     if (res == PNG_SUCCESS)
     {
-        #ifdef DEBUG_ON
+#ifdef DEBUG_ON
         Serial.println("Successfully opened png file");
         Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
         Serial.printf("Image size: %d\n", length);
         Serial.printf("Buffer size: %d\n", png.getBufferSize());
-        #endif
+#endif
         display[screenIndex].activate();
         tft.startWrite();
         uint32_t dt = millis();
@@ -587,8 +587,12 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
         {
             printPngError(png.getLastError());
         }
+#ifdef DEBUG_ON
+
         Serial.print(millis() - dt);
         Serial.println("ms");
+#endif
+
         tft.endWrite();
         display[screenIndex].deActivate();
 
@@ -731,10 +735,12 @@ void printPngError(int errorCode)
 size_t displayTestPngImage(const char *imageBase64Png)
 {
     size_t length = base64::decodeLength(imageBase64Png);
-    Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
     base64::decode(imageBase64Png, decodedBase64Data);
 
+#ifdef DEBUG_ON
+    Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
     Serial.printf("base64 decoded length = %ld\n", length);
+#endif
 
     displayPngFromRam(decodedBase64Data, length, currentDisplay);
     return length;
