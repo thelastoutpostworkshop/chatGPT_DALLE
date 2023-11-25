@@ -24,6 +24,8 @@ const int testImagesCount = 4;
 
 #ifdef USE_SD_CARD
 #define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
+const char* ID_FILENAME = "id.txt";
+const char* IMAGES_FOLDER_NAME = "images";
 int idForNewFile = 1;
 #endif
 
@@ -44,7 +46,7 @@ const char *endToken = "\"";
 const int promptsCount = 10;
 char *prompts[promptsCount] = {"An alien planet with ships orbiting", "A star wars spaceship", "A spaceship cockpit view in space",
                                "An empire spaceship attacking", "The interior of a sspaceship", "Control Panels of a spaceship",
-                               "A futurisctic HUD screen","A futuristic City","A spaceship docked on a spaceport",
+                               "A futurisctic HUD screen", "A futuristic City", "A spaceship docked on a spaceport",
                                "A spaceship being repaired"};
 
 int16_t xpos = 0;
@@ -99,7 +101,8 @@ void setup()
         }
     }
     idForNewFile = readNextId(SD) + 1;
-    Serial.printf("ID for the next file is %d\n", idForNewFile);
+    Serial.pr(intf("ID for the next file is %d\n", idForNewFile);
+    createDir(SD,IMAGES_FOLDER_NAME);
 
 #endif
 }
@@ -160,8 +163,8 @@ bool initSDCard(void)
 int readNextId(fs::FS &fs)
 {
     Serial.println("Reading next ID");
-
-    File file = fs.open("/id.txt");
+    String idFilename = ID_FILENAME;
+    File file = fs.open("/" + idFilename);
     if (!file)
     {
         Serial.println("Failed to open ID file for reading");
@@ -181,8 +184,9 @@ int readNextId(fs::FS &fs)
 void writeNextId(fs::FS &fs, int id)
 {
     Serial.println("Writing next ID");
+    String idFilename = ID_FILENAME;
 
-    File file = fs.open("/id.txt", FILE_WRITE);
+    File file = fs.open("/" + idFilename, FILE_WRITE);
     if (!file)
     {
         Serial.println("Failed to open file for writing");
@@ -196,7 +200,7 @@ void writeNextId(fs::FS &fs, int id)
     Serial.println("ID written successfully");
 }
 
-void writeFile(fs::FS &fs, const char *path, uint8_t *image, size_t length)
+void writeImage(fs::FS &fs, const char *path, uint8_t *image, size_t length)
 {
     Serial.printf("Writing file: %s\n", path);
 
@@ -215,6 +219,19 @@ void writeFile(fs::FS &fs, const char *path, uint8_t *image, size_t length)
         Serial.println("Write failed");
     }
     file.close();
+}
+
+void createDir(fs::FS &fs, const char *path)
+{
+    Serial.printf("Creating Dir: %s\n", path);
+    if (fs.mkdir(path))
+    {
+        Serial.println("Dir created");
+    }
+    else
+    {
+        Serial.println("mkdir failed");
+    }
 }
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
@@ -289,9 +306,9 @@ void generateAIImages(void)
     size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
 #ifdef USE_SD_CARD
-    String filename = "/images/" + String(idForNewFile) + ".png";
+    String filename = "/"+String(IMAGES_FOLDER_NAME)+"/" + String(idForNewFile) + ".png";
     idForNewFile += 1;
-    writeFile(SD, filename.c_str(), decodedBase64Data, length);
+    writeImage(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
 #endif
     delay(5000);
