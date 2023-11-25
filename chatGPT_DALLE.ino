@@ -8,7 +8,7 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
-#include "ai.h"
+#include "ai.h"           // Animated GIF
 
 // #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
