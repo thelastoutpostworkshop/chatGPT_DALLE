@@ -165,7 +165,7 @@ int readNextId(fs::FS &fs)
     if (!file)
     {
         Serial.println("Failed to open ID file for reading");
-        return -1;
+        return 0;
     }
 
     String fileContent = "";
