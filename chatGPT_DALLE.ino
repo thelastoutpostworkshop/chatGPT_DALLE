@@ -7,8 +7,8 @@
 #include "display.h"
 #include "switch.h"
 
-#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
-#define USE_SD_CARD       // Comment this line if you don't have an SD Card module
+// #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+#define USE_SD_CARD // Comment this line if you don't have an SD Card module
 
 #ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
@@ -95,8 +95,8 @@ void setup()
             // Infinite loop, code execution useless without PSRAM
         }
     }
-    idForNewFile = readNextId(SD)+1;
-    Serial.printf("ID for the next file is %d\n",idForNewFile);
+    idForNewFile = readNextId(SD) + 1;
+    Serial.printf("ID for the next file is %d\n", idForNewFile);
 
 #endif
 }
@@ -154,17 +154,20 @@ bool initSDCard(void)
     return true;
 }
 
-int readNextId(fs::FS &fs) {
+int readNextId(fs::FS &fs)
+{
     Serial.println("Reading next ID");
 
     File file = fs.open("/id.txt");
-    if (!file) {
+    if (!file)
+    {
         Serial.println("Failed to open ID file for reading");
         return -1;
     }
 
     String fileContent = "";
-    while (file.available()) {
+    while (file.available())
+    {
         fileContent += (char)file.read();
     }
     file.close();
@@ -172,11 +175,13 @@ int readNextId(fs::FS &fs) {
     return fileContent.toInt(); // Convert string to integer and return
 }
 
-void writeNextId(fs::FS &fs, int id) {
+void writeNextId(fs::FS &fs, int id)
+{
     Serial.println("Writing next ID");
 
     File file = fs.open("/id.txt", FILE_WRITE);
-    if (!file) {
+    if (!file)
+    {
         Serial.println("Failed to open file for writing");
         return;
     }
@@ -187,7 +192,6 @@ void writeNextId(fs::FS &fs, int id) {
     file.close();
     Serial.println("ID written successfully");
 }
-
 
 void writeFile(fs::FS &fs, const char *path, uint8_t *image, size_t length)
 {
@@ -276,17 +280,17 @@ void generateAIImages(void)
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = testPngImage(image);
     display[currentDisplay].storeImage(decodedBase64Data, length);
-
-    String filename = "/" + String(idForNewFile) + ".png";
-    idForNewFile+=1;
-    writeFile(SD, filename.c_str(), decodedBase64Data, length);
-    writeNextId(SD,idForNewFile);
-    
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
 #else
     size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
+#ifdef USE_SD_CARD
+    String filename = "/" + String(idForNewFile) + ".png";
+    idForNewFile += 1;
+    writeFile(SD, filename.c_str(), decodedBase64Data, length);
+    writeNextId(SD, idForNewFile);
+#endif
     delay(5000);
     shifImagesOnDisplayLeft();
 #endif
