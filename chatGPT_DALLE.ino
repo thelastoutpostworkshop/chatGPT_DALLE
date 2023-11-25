@@ -122,7 +122,7 @@ void loop()
     }
 }
 
-void playAIGif(void *parameter)
+void playAIGif()
 {
     gif.playFrame(true, NULL);
 }
@@ -323,7 +323,10 @@ void generateAIImages(void)
 {
 #ifdef SIMULE_CALL_DALLE
     startPlayAIGif();
-    delay(5000); // Delay for simulation
+    unsigned long t = millis();
+    while(millis()-t < 5000) {
+        playAIGif();
+    }
     stopPlayAIGif();
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayTestPngImage(image);
