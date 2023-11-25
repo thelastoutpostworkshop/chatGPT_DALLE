@@ -79,6 +79,7 @@ void setup()
     Serial.begin(115200);
     initWebServer();
     createTaskCore();
+    gif.begin(BIG_ENDIAN_PIXELS);
 
     if (!initDisplay())
     {
