@@ -11,7 +11,10 @@
 #include "ai.h" // Animated GIF
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+
+#ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD       // Comment this line if you don't have an SD Card module
+#endif
 
 #ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
@@ -141,6 +144,7 @@ void stopPlayAIGif(void)
     display[0].deActivate();
 }
 
+#ifdef USE_SD_CARD
 bool initSDCard(void)
 {
     // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
@@ -298,6 +302,8 @@ void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
         file = root.openNextFile();
     }
 }
+#endif
+
 
 void generationSwitchTask(void *parameter)
 {
