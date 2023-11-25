@@ -1,12 +1,13 @@
-#include <PNGdec.h>       // Install this library with the Arduino IDE Library Manager
-#include <TFT_eSPI.h>     // Install this library with the Arduino IDE Library Manager
-#include <AnimatedGIF.h>  // Install this library with the Arduino IDE Library Manager
+#include <PNGdec.h>      // Install this library with the Arduino IDE Library Manager
+#include <TFT_eSPI.h>    // Install this library with the Arduino IDE Library Manager
+#include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 #include <SD.h>
 #include "WebServer.h"
 #include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
+#include "ai.h"
 
 // #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -25,10 +26,13 @@ const int testImagesCount = 4;
 
 #ifdef USE_SD_CARD
 #define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
-const char* ID_FILENAME = "id.txt";
-const char* IMAGES_FOLDER_NAME = "/images";
+const char *ID_FILENAME = "id.txt";
+const char *IMAGES_FOLDER_NAME = "/images";
 int idForNewFile = 1;
 #endif
+
+#define GIF_IMAGE ai
+AnimatedGIF gif;
 
 // Switch
 SwitchReader generationSwitch(1);
@@ -103,23 +107,38 @@ void setup()
     }
     idForNewFile = readNextId(SD) + 1;
     Serial.printf("ID for the next file is %d\n", idForNewFile);
-    createDir(SD,IMAGES_FOLDER_NAME);
+    createDir(SD, IMAGES_FOLDER_NAME);
 
 #endif
 }
 
 void loop()
 {
-    if (runImageGeneration)
+    if (gif.open((uint8_t *)GIF_IMAGE, sizeof(GIF_IMAGE), GIFDraw))
     {
-        generateAIImages();
+        Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
+        display[0].activate();
+
+        tft.startWrite();
+        while (gif.playFrame(true, NULL))
+        {
+            yield();
+        }
+        gif.close();
+        tft.endWrite();
+        display[0].deActivate();
     }
-    delay(1);
+
+    // if (runImageGeneration)
+    // {
+    //     generateAIImages();
+    // }
+    // delay(1);
 }
 
 bool initSDCard(void)
 {
-    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display 
+    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
     // Initialize SD card
     if (!SD.begin(SD_CARD_CS_PIN))
     {
@@ -308,7 +327,7 @@ void generateAIImages(void)
     size_t length = generateDalleImageRandomPrompt();
     display[currentDisplay].storeImage(decodedBase64Data, length);
 #ifdef USE_SD_CARD
-    String filename = String(IMAGES_FOLDER_NAME)+"/" + String(idForNewFile) + ".png";
+    String filename = String(IMAGES_FOLDER_NAME) + "/" + String(idForNewFile) + ".png";
     idForNewFile += 1;
     writeImage(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
@@ -387,7 +406,7 @@ bool verifyScreenIndex(int screenIndex)
 
 bool initDisplay(void)
 {
-    tft.init();
+    tft.init(BIG_ENDIAN_PIXELS);
     tft.setFreeFont(&FreeMono24pt7b);
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
