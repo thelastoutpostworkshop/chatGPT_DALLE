@@ -460,6 +460,7 @@ size_t genereteDalleImage(char *prompt)
 
 void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 {
+    startPlayAIGif();
     *readBuffer = ""; // Clear the buffer
 
     WiFiClientSecure client;
@@ -470,7 +471,9 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
     if (!client.connect(host, httpsPort))
     {
+        playAIGif();
         Serial.println("Connection failed");
+        stopPlayAIGif();
         return;
     }
 
@@ -494,6 +497,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
     while (client.connected())
     {
+        playAIGif();
         String line = client.readStringUntil('\n');
         // Serial.println(line);
         if (line == "\r")
@@ -513,6 +517,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     // Read and process the response in chunks
     while (client.available() && !base64EndFound)
     {
+        playAIGif();
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
         buffer[bufferLength] = '\0'; 
         if (!base64StartFound)
@@ -562,6 +567,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     #ifdef DEBUG_ON
     Serial.println("Request call completed");
     #endif
+    stopPlayAIGif();
 }
 
 void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int screenIndex)
