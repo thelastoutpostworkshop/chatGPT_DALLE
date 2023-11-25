@@ -72,7 +72,6 @@ Display display[NUM_DISPLAYS] = {
     Display(7),
     Display(6),
     Display(16)};
-int currentDisplay = 0;
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -338,12 +337,12 @@ void generateAIImages(void)
     stopPlayAIGif();
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayTestPngImage(image);
-    display[currentDisplay].storeImage(decodedBase64Data, length);
+    display[0].storeImage(decodedBase64Data, length);
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
 #else
     size_t length = generateDalleImageRandomPrompt();
-    display[currentDisplay].storeImage(decodedBase64Data, length);
+    display[0].storeImage(decodedBase64Data, length);
 #ifdef USE_SD_CARD
     String filename = String(IMAGES_FOLDER_NAME) + "/" + String(idForNewFile) + ".png";
     idForNewFile += 1;
@@ -459,7 +458,7 @@ size_t genereteDalleImage(char *prompt)
 
     Serial.printf("base64 decoded length = %ld\n", length);
 
-    displayPngFromRam(decodedBase64Data, length, currentDisplay);
+    displayPngFromRam(decodedBase64Data, length, 0);
     return length;
 }
 
@@ -605,18 +604,6 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
     }
 }
 
-void changeDisplayTo(int displayIndex)
-{
-    if (displayIndex >= 0 && displayIndex < NUM_DISPLAYS)
-    {
-        currentDisplay = displayIndex;
-    }
-    else
-    {
-        Serial.printf("!!! Display index wrong = %d\n", displayIndex);
-    }
-}
-
 // Memory allocation in PSRAM
 bool allocatePsramMemory(void)
 {
@@ -743,7 +730,7 @@ size_t displayTestPngImage(const char *imageBase64Png)
     Serial.printf("base64 decoded length = %ld\n", length);
 #endif
 
-    displayPngFromRam(decodedBase64Data, length, currentDisplay);
+    displayPngFromRam(decodedBase64Data, length, 0);
     return length;
 }
 
