@@ -87,7 +87,7 @@ void setup()
     }
 
 #ifdef USE_SD_CARD
-    // Make sure SPI_FREQUENCY is 20000000 in your TFT driver
+    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
     // Initialize SD card
     if (!SD.begin(SD_CARD_CS_PIN,tft.getSPIinstance())) {
         Serial.println("SD Card initialization failed!");
