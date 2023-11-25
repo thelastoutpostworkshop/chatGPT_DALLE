@@ -88,10 +88,14 @@ void setup()
 
 #ifdef USE_SD_CARD
     if (!initSDCard())
+    {
         while (true)
         {
             // Infinite loop, code execution useless without PSRAM
         }
+    } else {
+            listDir(SD, "/", 0);
+    }
 #endif
 }
 
@@ -108,7 +112,7 @@ bool initSDCard(void)
 {
     // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
     // Initialize SD card
-    if (!SD.begin(SD_CARD_CS_PIN, tft.getSPIinstance()))
+    if (!SD.begin(SD_CARD_CS_PIN))
     {
         Serial.println("SD Card initialization failed!");
         return false;
@@ -146,6 +150,37 @@ bool initSDCard(void)
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
     return true;
+}
+
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\n", dirname);
+
+    File root = fs.open(dirname);
+    if(!root){
+        Serial.println("Failed to open directory");
+        return;
+    }
+    if(!root.isDirectory()){
+        Serial.println("Not a directory");
+        return;
+    }
+
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
+            if(levels){
+                listDir(fs, file.path(), levels -1);
+            }
+        } else {
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("  SIZE: ");
+            Serial.println(file.size());
+        }
+        file = root.openNextFile();
+    }
 }
 
 void generationSwitchTask(void *parameter)
