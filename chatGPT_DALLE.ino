@@ -101,7 +101,7 @@ void setup()
         }
     }
     idForNewFile = readNextId(SD) + 1;
-    Serial.pr(intf("ID for the next file is %d\n", idForNewFile);
+    Serial.printf("ID for the next file is %d\n", idForNewFile);
     createDir(SD,IMAGES_FOLDER_NAME);
 
 #endif
@@ -122,6 +122,7 @@ bool initSDCard(void)
     // Initialize SD card
     if (!SD.begin(SD_CARD_CS_PIN))
     {
+        // You can get this error if no Micro SD card is inserted into the module
         Serial.println("SD Card initialization failed!");
         return false;
     }
