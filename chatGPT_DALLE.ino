@@ -7,7 +7,8 @@
 #include "display.h"
 #include "switch.h"
 
-#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+#define SIMULE_CALL_DALLE   // Uncomment this line to make the real call to the DALLE API
+#define USE_SD_CARD         // Comment this line if you don't have an SD Card module
 
 #ifdef SIMULE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
@@ -19,6 +20,10 @@
 // Test PNG Images
 const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png, hal64Png};
 const int testImagesCount = 4;
+#endif
+
+#ifdef USE_SD_CARD
+#define SD_CARD_CS_PIN 9    // Chip Select Pin for the SD Card Module
 #endif
 
 // Switch
@@ -64,12 +69,6 @@ void setup()
     initWebServer();
     createTaskCore();
 
-    // Initialize SD card
-    // if (!SD.begin(8)) {
-    //     Serial.println("SD Card initialization failed!");
-    // } else {
-    //     Serial.println("SD Card initialization success");
-    // }
     if (!initDisplay())
     {
         Serial.println("!!! Cannot allocate enough PSRAM to store images");
@@ -87,9 +86,15 @@ void setup()
         }
     }
 
-    // size_t length = testPngImage(testPngImages[myRandom(testImagesCount)]);
-    // // size_t length = generateDalleImageRandomPrompt();
-    // display[currentDisplay].storeImage(decodedBase64Data, length);
+#ifdef USE_SD_CARD
+    // Make sure SPI_FREQUENCY is 20000000 in your TFT driver
+    // Initialize SD card
+    if (!SD.begin(SD_CARD_CS_PIN,tft.getSPIinstance())) {
+        Serial.println("SD Card initialization failed!");
+    } else {
+        Serial.println("SD Card initialization success");
+    }
+#endif
 }
 
 void loop()
