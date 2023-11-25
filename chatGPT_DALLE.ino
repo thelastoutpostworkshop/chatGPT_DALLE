@@ -1,5 +1,6 @@
 #include <PNGdec.h>
 #include <TFT_eSPI.h>
+#include <SD.h>       
 #include "WebServer.h"
 #include <WiFiClientSecure.h>
 #include "arduino_base64.hpp"
@@ -63,6 +64,12 @@ void setup()
     initWebServer();
     createTaskCore();
 
+    // Initialize SD card
+    // if (!SD.begin(8)) {
+    //     Serial.println("SD Card initialization failed!");
+    // } else {
+    //     Serial.println("SD Card initialization success");
+    // }
     if (!initDisplay())
     {
         Serial.println("!!! Cannot allocate enough PSRAM to store images");
@@ -199,7 +206,7 @@ bool initDisplay(void)
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         display[i].activate();
-        tft.fillScreen(TFT_BLACK);
+        tft.fillScreen(TFT_WHITE);
         tft.setRotation(2); // Adjust Rotation of your screen (0-3)
         display[i].deActivate();
     }
