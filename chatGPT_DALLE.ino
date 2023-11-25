@@ -41,10 +41,11 @@ const char *startToken = "\"b64_json\": \"";
 const char *endToken = "\"";
 
 // Prompts
-const int promptsCount = 7;
-char *prompts[promptsCount] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars scene",
+const int promptsCount = 10;
+char *prompts[promptsCount] = {"An alien planet with ships orbiting", "A star wars spaceship", "A spaceship cockpit view in space",
                                "An empire spaceship attacking", "The interior of a sspaceship", "Control Panels of a spaceship",
-                               "A sci-fi tactial screen"};
+                               "A futurisctic HUD screen","A futuristic City","A spaceship docked on a spaceport",
+                               "A spaceship being repaired"};
 
 int16_t xpos = 0;
 int16_t ypos = 0;
