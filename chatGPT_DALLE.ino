@@ -266,7 +266,7 @@ void generationSwitchTask(void *parameter)
             }
             else
             {
-                Serial.println("Image generation stopped");
+                Serial.println("Image generation will be stopped");
             }
         }
         vTaskDelay(50 / portTICK_PERIOD_MS); // Delay to prevent task from running too frequently
