@@ -336,7 +336,7 @@ void generateAIImages(void)
     }
     stopPlayAIGif();
     const char *image = testPngImages[myRandom(testImagesCount)];
-    size_t length = displayTestPngImage(image);
+    size_t length = displayPngImage(image,0);
     display[0].storeImage(decodedBase64Data, length);
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
@@ -453,12 +453,8 @@ size_t generateDalleImageRandomPrompt(void)
 size_t genereteDalleImage(char *prompt)
 {
     callOpenAIAPIDalle(&base64Data, prompt);
-    size_t length = base64::decodeLength(base64Data.c_str());
-    base64::decode(base64Data.c_str(), decodedBase64Data);
+    size_t length = displayPngImage(base64Data.c_str(),0);
 
-    Serial.printf("base64 decoded length = %ld\n", length);
-
-    displayPngFromRam(decodedBase64Data, length, 0);
     return length;
 }
 
@@ -720,7 +716,7 @@ void printPngError(int errorCode)
     }
 }
 
-size_t displayTestPngImage(const char *imageBase64Png)
+size_t displayPngImage(const char *imageBase64Png,int displayIndex)
 {
     size_t length = base64::decodeLength(imageBase64Png);
     base64::decode(imageBase64Png, decodedBase64Data);
@@ -730,7 +726,7 @@ size_t displayTestPngImage(const char *imageBase64Png)
     Serial.printf("base64 decoded length = %ld\n", length);
 #endif
 
-    displayPngFromRam(decodedBase64Data, length, 0);
+    displayPngFromRam(decodedBase64Data, length, displayIndex);
     return length;
 }
 
