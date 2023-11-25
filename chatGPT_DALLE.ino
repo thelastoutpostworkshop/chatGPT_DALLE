@@ -93,9 +93,8 @@ void setup()
         {
             // Infinite loop, code execution useless without PSRAM
         }
-    } else {
-            listDir(SD, "/", 0);
     }
+
 #endif
 }
 
@@ -152,28 +151,57 @@ bool initSDCard(void)
     return true;
 }
 
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+void writeFile(fs::FS &fs, const char *path, const char *message)
+{
+    Serial.printf("Writing file: %s\n", path);
+
+    File file = fs.open(path, FILE_WRITE);
+    if (!file)
+    {
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+    if (file.print(message))
+    {
+        Serial.println("File written");
+    }
+    else
+    {
+        Serial.println("Write failed");
+    }
+    file.close();
+}
+
+void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
+{
     Serial.printf("Listing directory: %s\n", dirname);
 
     File root = fs.open(dirname);
-    if(!root){
+    if (!root)
+    {
         Serial.println("Failed to open directory");
         return;
     }
-    if(!root.isDirectory()){
+    if (!root.isDirectory())
+    {
         Serial.println("Not a directory");
         return;
     }
 
     File file = root.openNextFile();
-    while(file){
-        if(file.isDirectory()){
+    while (file)
+    {
+        if (file.isDirectory())
+        {
             Serial.print("  DIR : ");
             Serial.println(file.name());
-            if(levels){
-                listDir(fs, file.path(), levels -1);
+            if (levels)
+            {
+                listDir(fs, file.path(), levels - 1);
             }
-        } else {
+        }
+        else
+        {
             Serial.print("  FILE: ");
             Serial.print(file.name());
             Serial.print("  SIZE: ");
