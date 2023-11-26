@@ -176,6 +176,11 @@ void readRotaryEncoder(void)
     if (i == 1)
     {
         Serial.println("CW");
+    }
+
+    if (i == 2)
+    {
+        Serial.println("CCW");
         String filename = String(IMAGES_FOLDER_NAME) + "/" + String(1) + ".png";
         image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
         if (image != NULL)
@@ -183,11 +188,6 @@ void readRotaryEncoder(void)
             size_t length = displayPngImage((const char *)image, 0);
             display[0].storeImage(decodedBase64Data, length);
         }
-    }
-
-    if (i == 2)
-    {
-        Serial.println("CCW");
     }
 }
 
@@ -319,6 +319,7 @@ uint8_t *readPNGImageFromSDCard(const char *filename, size_t *imageSize)
         file.close();
         return NULL;
     }
+    DEBUG_PRINTF("File Size on SD Card is %u\n", fileSize);
 
     // Allocate memory for the file content
     uint8_t *buffer = new uint8_t[fileSize];
