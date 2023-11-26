@@ -175,7 +175,7 @@ void readRotaryEncoder(void)
 
     if (i == 1)
     {
-        Serial.println("CW");
+        DEBUG_PRINTLN("Clockwise");
     }
 
     if (i == 2)
@@ -184,7 +184,7 @@ void readRotaryEncoder(void)
         if(currentSDCardFileIndex <= 0) {
             currentSDCardFileIndex = idForNewFile-1;
         }
-        Serial.println("CCW");
+        DEBUG_PRINTLN("Counter Clockwise");
         shifImagesOnDisplayLeft();
         displayPngFileFromSDCard(currentSDCardFileIndex,0);
     }
