@@ -39,6 +39,7 @@ int idForNewFile = 1;
 
 #define GIF_IMAGE ai
 AnimatedGIF gif;
+TaskHandle_t taskHandlePlayGif = NULL;
 
 // Switch
 SwitchReader generationSwitch(1);
@@ -126,9 +127,13 @@ void loop()
     }
 }
 
-void playAIGif()
+void playAIGif(void *parameter)
 {
-    gif.playFrame(true, NULL);
+    for (;;)
+    {
+        gif.playFrame(true, NULL);
+        vTaskDelay(5 / portTICK_PERIOD_MS);
+    }
 }
 
 void startPlayAIGif(void)
@@ -136,13 +141,36 @@ void startPlayAIGif(void)
     gif.open((uint8_t *)GIF_IMAGE, sizeof(GIF_IMAGE), GIFDraw);
     display[0].activate();
     tft.startWrite();
+    if (taskHandlePlayGif == NULL)
+    {
+        taskHandlePlayGif = playAIGifTask();
+    }
 }
 
 void stopPlayAIGif(void)
 {
+    if (taskHandlePlayGif != NULL)
+    {
+        vTaskDelete(taskHandlePlayGif);
+        taskHandlePlayGif = NULL; // Set to NULL to indicate that the task is no longer running
+    }
     gif.close();
     tft.endWrite();
     display[0].deActivate();
+}
+
+TaskHandle_t playAIGifTask()
+{
+    TaskHandle_t taskHandle = NULL;
+    xTaskCreate(
+        playAIGif,   // Task function
+        "playAIGif", // Name of task
+        2048,        // Stack size of task (adjust as needed)
+        NULL,        // Parameter of the task
+        1,           // Priority of the task
+        &taskHandle  // Task handle
+    );
+    return taskHandle;
 }
 
 #ifdef USE_SD_CARD
@@ -332,7 +360,6 @@ void generateAIImages(void)
     unsigned long t = millis();
     while (millis() - t < 5000)
     {
-        playAIGif();
     }
     stopPlayAIGif();
     const char *image = testPngImages[myRandom(testImagesCount)];
@@ -471,7 +498,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
     if (!client.connect(host, httpsPort))
     {
-        playAIGif();
+        // playAIGif();
         Serial.println("Connection failed");
         stopPlayAIGif();
         return;
@@ -497,7 +524,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
     while (client.connected())
     {
-        playAIGif();
+        // playAIGif();
         String line = client.readStringUntil('\n');
         // Serial.println(line);
         if (line == "\r")
@@ -517,9 +544,9 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     // Read and process the response in chunks
     while (client.available() && !base64EndFound)
     {
-        playAIGif();
+        // playAIGif();
         bufferLength = client.readBytes(buffer, sizeof(buffer) - 1);
-        buffer[bufferLength] = '\0'; 
+        buffer[bufferLength] = '\0';
         if (!base64StartFound)
         {
             char *base64Start = strstr(buffer, startToken);
@@ -564,9 +591,9 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
         Serial.println("!!! No Json Base64 data in Response:");
         Serial.println(buffer);
     }
-    #ifdef DEBUG_ON
+#ifdef DEBUG_ON
     Serial.println("Request call completed");
-    #endif
+#endif
     stopPlayAIGif();
 }
 
