@@ -11,8 +11,8 @@
 #include "images\ai.h"       // AI Animated GIF
 #include "images\readyPng.h" // Ready PNG
 
-// #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor
+#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+// #define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor, only errors will be printed
 
 #ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -641,7 +641,7 @@ bool allocatePsramMemory(void)
     if (psramFound())
     {
 
-        Serial.printf("PSRAM Size=%ld\n", ESP.getPsramSize());
+        DEBUG_PRINTF("PSRAM Size=%ld\n", ESP.getPsramSize());
 
         decodedBase64Data = (uint8_t *)ps_malloc(PSRAM_BUFFER_DECODED_LENGTH);
         if (decodedBase64Data == NULL)
