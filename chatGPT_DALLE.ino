@@ -22,7 +22,7 @@
 #include "images\readyAnimation.h"
 
 // #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+#define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -168,11 +168,15 @@ void loop()
 void readRotaryEncoder(void)
 {
     byte i;
+    size_t imageSize;
+    uint8_t *image;
     // 0 = not turning, 1 = CW, 2 = CCW
     i = rotary.rotate();
 
     if (i == 1)
     {
+        String filename = String(IMAGES_FOLDER_NAME) + "/" + String(1) + ".png";
+        readPNGImageFromSDCard(filename.c_str(),&imageSize);
         Serial.println("CW");
     }
 
@@ -291,26 +295,30 @@ bool initSDCard(void)
     return true;
 }
 
-uint8_t* readPNGImage(fs::FS &fs, const char* filename, size_t* imageSize) {
+uint8_t *readPNGImageFromSDCard(const char *filename, size_t *imageSize)
+{
     DEBUG_PRINTLN("Reading PNG Image");
 
-    File file = fs.open(filename, FILE_READ);
-    if (!file) {
+    File file = SD.open(filename, FILE_READ);
+    if (!file)
+    {
         Serial.println("!!! Failed to open PNG file for reading");
         return NULL;
     }
 
     // Get the size of the file
     size_t fileSize = file.size();
-    if (fileSize == 0) {
+    if (fileSize == 0)
+    {
         Serial.println("!!! PNG file is empty");
         file.close();
         return NULL;
     }
 
     // Allocate memory for the file content
-    uint8_t* buffer = new uint8_t[fileSize];
-    if (!buffer) {
+    uint8_t *buffer = new uint8_t[fileSize];
+    if (!buffer)
+    {
         Serial.println("!!! Failed to allocate memory for PNG image");
         file.close();
         return NULL;
@@ -320,7 +328,8 @@ uint8_t* readPNGImage(fs::FS &fs, const char* filename, size_t* imageSize) {
     size_t bytesRead = file.read(buffer, fileSize);
     file.close();
 
-    if (bytesRead != fileSize) {
+    if (bytesRead != fileSize)
+    {
         Serial.println("!!! Failed to read the entire PNG file");
         delete[] buffer;
         return NULL;
@@ -331,7 +340,6 @@ uint8_t* readPNGImage(fs::FS &fs, const char* filename, size_t* imageSize) {
 
     return buffer;
 }
-
 
 int readNextId(fs::FS &fs)
 {
