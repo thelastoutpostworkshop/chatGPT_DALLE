@@ -3,7 +3,7 @@
 // The round display (https://amzn.to/3L4pud6) use the GC9A01 driver from the TFT_eSPI library
 // The Micro SD Card Module (optional) is this one : https://amzn.to/46tSgvn
 //
-// See the full tutorial here : 
+// See the full tutorial here :
 
 #include <PNGdec.h>      // Install this library with the Arduino IDE Library Manager
 #include <TFT_eSPI.h>    // Install this library with the Arduino IDE Library Manager
@@ -20,7 +20,7 @@
 #include "images\readyAnimation.h"
 
 // #define SIMULE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+#define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -102,6 +102,21 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
+
+#ifdef USE_SD_CARD
+    if (!initSDCard())
+    {
+        while (true)
+        {
+            // Infinite loop, code execution useless without PSRAM
+        }
+    }
+    idForNewFile = readNextId(SD) + 1;
+    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
+    createDir(SD, IMAGES_FOLDER_NAME);
+
+#endif
+
     connectToWifiNetwork();
     gif.begin(BIG_ENDIAN_PIXELS);
 
@@ -122,19 +137,6 @@ void setup()
         }
     }
 
-#ifdef USE_SD_CARD
-    if (!initSDCard())
-    {
-        while (true)
-        {
-            // Infinite loop, code execution useless without PSRAM
-        }
-    }
-    idForNewFile = readNextId(SD) + 1;
-    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
-    createDir(SD, IMAGES_FOLDER_NAME);
-
-#endif
     createTaskCore();
 }
 
@@ -143,7 +145,8 @@ void loop()
     if (runImageGeneration)
     {
         generateAIImages();
-        if(!runImageGeneration) {
+        if (!runImageGeneration)
+        {
             playReadyOnScreens();
         }
     }
@@ -214,10 +217,10 @@ TaskHandle_t playAIGifTask()
 }
 
 #ifdef USE_SD_CARD
+// Initialize Micro SD card Module
 bool initSDCard(void)
 {
     // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
-    // Initialize SD card
     if (!SD.begin(SD_CARD_CS_PIN))
     {
         // You can get this error if no Micro SD card is inserted into the module
