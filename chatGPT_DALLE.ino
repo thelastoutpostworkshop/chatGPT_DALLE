@@ -9,6 +9,7 @@
 #include <TFT_eSPI.h>    // Install this library with the Arduino IDE Library Manager
                          // Don't forget to configure the driver for your display!
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
+#include <SimpleRotary.h>
 #include <SD.h>
 #include <WiFiClientSecure.h>
 #include "secrets.h"
@@ -47,6 +48,8 @@
 const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png, hal64Png};
 const int testImagesCount = 4;
 #endif
+
+SimpleRotary rotary(41, 42, 40);
 
 #ifdef USE_SD_CARD
 #define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
@@ -146,6 +149,23 @@ void loop()
         if (!runImageGeneration)
         {
             playReadyOnScreens();
+        }
+    }
+    else
+    {
+        byte i;
+
+        // 0 = not turning, 1 = CW, 2 = CCW
+        i = rotary.rotate();
+
+        if (i == 1)
+        {
+            Serial.println("CW");
+        }
+
+        if (i == 2)
+        {
+            Serial.println("CCW");
         }
     }
 }
