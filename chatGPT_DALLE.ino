@@ -10,6 +10,7 @@
 #include "switch.h"
 #include "images\ai.h"       // AI Animated GIF
 #include "images\readyPng.h" // Ready PNG
+#include "images\transition.h"
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
