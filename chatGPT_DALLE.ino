@@ -20,10 +20,10 @@
 #include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
-// #define SIMULE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
+#define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
 #define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
-#ifndef SIMULE_CALL_DALLE
+#ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
 #endif
 
@@ -37,7 +37,7 @@
 #define DEBUG_PRINTF(...)
 #endif
 
-#ifdef SIMULE_CALL_DALLE
+#ifdef SIMULATE_CALL_DALLE
 #include "base64_test_images\mandalaBase64Png.h"
 #include "base64_test_images\rainbowBase64Png.h"
 #include "base64_test_images\resistance.h"
@@ -415,7 +415,7 @@ void generationSwitchTask(void *parameter)
 
 void generateAIImages(void)
 {
-#ifdef SIMULE_CALL_DALLE
+#ifdef SIMULATE_CALL_DALLE
     startPlayAIGifAsync();
     unsigned long t = millis();
     while (millis() - t < 5000)
