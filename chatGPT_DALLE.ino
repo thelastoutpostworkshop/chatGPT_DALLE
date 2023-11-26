@@ -97,6 +97,14 @@ void setup()
     createTaskCore();
     gif.begin(BIG_ENDIAN_PIXELS);
 
+    if (!allocatePsramMemory())
+    {
+        while (true)
+        {
+            // Infinite loop, code execution useless without PSRAM
+        }
+    }
+    
     if (!initDisplay())
     {
         Serial.println("!!! Cannot allocate enough PSRAM to store images");
@@ -106,13 +114,6 @@ void setup()
         }
     }
 
-    if (!allocatePsramMemory())
-    {
-        while (true)
-        {
-            // Infinite loop, code execution useless without PSRAM
-        }
-    }
 
 #ifdef USE_SD_CARD
     if (!initSDCard())
@@ -467,8 +468,9 @@ bool initDisplay(void)
         display[i].activate();
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2); // Adjust Rotation of your screen (0-3)
-        tft.setCursor(40, 120);
-        tft.print("Ready!");
+        displayPngImage(ready64Png,i);
+        // tft.setCursor(40, 120);
+        // tft.print("Ready!");
         display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
