@@ -185,8 +185,8 @@ void readRotaryEncoder(void)
         image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
         if (image != NULL)
         {
-            size_t length = displayPngImage((const char *)image, 0);
-            display[0].storeImage(decodedBase64Data, length);
+            displayPngFromRam(image,imageSize,0);
+            display[0].storeImage((uint8_t*)image, imageSize);
         }
     }
 }

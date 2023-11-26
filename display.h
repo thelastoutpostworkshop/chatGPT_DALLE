@@ -4,7 +4,7 @@ class Display
 {
 private:
     int csPin;            // Chip Select pin
-    uint8_t *storedImage; // Pointer to the stored image
+    uint8_t *storedImage; // Pointer to the stored image in decoded format
     size_t size;          // Size of image, length = 0 indicate no image
 
 public:
