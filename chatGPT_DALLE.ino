@@ -12,10 +12,20 @@
 #include "images\readyPng.h" // Ready PNG
 
 // #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
-// #define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor
+#define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor
 
 #ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
+#endif
+
+#ifdef DEBUG_ON
+    #define DEBUG_PRINT(x)    Serial.print(x)
+    #define DEBUG_PRINTLN(x)  Serial.println(x)
+    #define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
+#else
+    #define DEBUG_PRINT(x)
+    #define DEBUG_PRINTLN(x)
+    #define DEBUG_PRINTF(...)
 #endif
 
 #ifdef SIMULE_CALL_DALLE
@@ -113,7 +123,7 @@ void setup()
         }
     }
     idForNewFile = readNextId(SD) + 1;
-    Serial.printf("ID for the next file is %d\n", idForNewFile);
+    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
     createDir(SD, IMAGES_FOLDER_NAME);
 
 #endif
@@ -181,7 +191,7 @@ bool initSDCard(void)
     if (!SD.begin(SD_CARD_CS_PIN))
     {
         // You can get this error if no Micro SD card is inserted into the module
-        Serial.println("SD Card initialization failed!");
+        Serial.println("!!! SD Card initialization failed!");
         return false;
     }
     else
@@ -192,41 +202,41 @@ bool initSDCard(void)
 
     if (cardType == CARD_NONE)
     {
-        Serial.println("No SD card attached");
+        Serial.println("!!! No SD card attached");
         return false;
     }
 
-    Serial.print("SD Card Type: ");
+    DEBUG_PRINTLN("SD Card Type: ");
     if (cardType == CARD_MMC)
     {
-        Serial.println("MMC");
+        DEBUG_PRINTLN("MMC");
     }
     else if (cardType == CARD_SD)
     {
-        Serial.println("SDSC");
+        DEBUG_PRINTLN("SDSC");
     }
     else if (cardType == CARD_SDHC)
     {
-        Serial.println("SDHC");
+        DEBUG_PRINTLN("SDHC");
     }
     else
     {
-        Serial.println("UNKNOWN");
+        DEBUG_PRINTLN("UNKNOWN");
     }
 
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
+    DEBUG_PRINTF("SD Card Size: %lluMB\n", cardSize);
     return true;
 }
 
 int readNextId(fs::FS &fs)
 {
-    Serial.println("Reading next ID");
+    DEBUG_PRINTLN("Reading next ID");
     String idFilename = ID_FILENAME;
     File file = fs.open("/" + idFilename);
     if (!file)
     {
-        Serial.println("Failed to open ID file for reading");
+        Serial.println("!!! Failed to open ID file for reading");
         return 0;
     }
 
@@ -242,13 +252,13 @@ int readNextId(fs::FS &fs)
 
 void writeNextId(fs::FS &fs, int id)
 {
-    Serial.println("Writing next ID");
+    DEBUG_PRINTLN("Writing next ID");
     String idFilename = ID_FILENAME;
 
     File file = fs.open("/" + idFilename, FILE_WRITE);
     if (!file)
     {
-        Serial.println("Failed to open file for writing");
+        Serial.println("!!! Failed to open file for writing");
         return;
     }
 
@@ -256,40 +266,40 @@ void writeNextId(fs::FS &fs, int id)
     file.print(id);
 
     file.close();
-    Serial.println("ID written successfully");
+    DEBUG_PRINTLN("ID written successfully");
 }
 
 void writeImage(fs::FS &fs, const char *path, uint8_t *image, size_t length)
 {
-    Serial.printf("Writing file: %s\n", path);
+    DEBUG_PRINTF("Writing file: %s\n", path);
 
     File file = fs.open(path, FILE_WRITE);
     if (!file)
     {
-        Serial.println("Failed to open file for writing");
+        Serial.println("!!! Failed to open file for writing");
         return;
     }
     if (file.write(image, length))
     {
-        Serial.println("File written");
+        DEBUG_PRINTLN("File written");
     }
     else
     {
-        Serial.println("Write failed");
+        Serial.println("!!! Write failed");
     }
     file.close();
 }
 
 void createDir(fs::FS &fs, const char *path)
 {
-    Serial.printf("Creating Dir: %s\n", path);
+    DEBUG_PRINTF("Creating Dir: %s\n", path);
     if (fs.mkdir(path))
     {
-        Serial.println("Dir created");
+        DEBUG_PRINTLN("Dir created");
     }
     else
     {
-        Serial.println("mkdir failed");
+        Serial.println("!!! mkdir failed");
     }
 }
 
@@ -499,7 +509,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     if (!client.connect(host, httpsPort))
     {
         // playAIGif();
-        Serial.println("Connection failed");
+        Serial.println("!!! Connection failed");
         stopPlayAIGif();
         return;
     }
@@ -518,20 +528,14 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
     client.print(request);
 
-#ifdef DEBUG_ON
-    Serial.printf("Request sent with prompt : %s\n", prompt);
-#endif
+    DEBUG_PRINTF("Request sent with prompt : %s\n", prompt);
 
     while (client.connected())
     {
-        // playAIGif();
         String line = client.readStringUntil('\n');
-        // Serial.println(line);
         if (line == "\r")
         {
-#ifdef DEBUG_ON
-            Serial.println("headers received");
-#endif
+           DEBUG_PRINTLN("headers received");
             break;
         }
     }
@@ -591,9 +595,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
         Serial.println("!!! No Json Base64 data in Response:");
         Serial.println(buffer);
     }
-#ifdef DEBUG_ON
-    Serial.println("Request call completed");
-#endif
+    DEBUG_PRINTLN("Request call completed");
     stopPlayAIGif();
 }
 
@@ -607,12 +609,10 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
     int res = png.openRAM((uint8_t *)pngImageinC, length, pngDraw);
     if (res == PNG_SUCCESS)
     {
-#ifdef DEBUG_ON
-        Serial.println("Successfully opened png file");
-        Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
-        Serial.printf("Image size: %d\n", length);
-        Serial.printf("Buffer size: %d\n", png.getBufferSize());
-#endif
+        DEBUG_PRINTLN("Successfully opened png file");
+        DEBUG_PRINTF("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
+        DEBUG_PRINTF("Image size: %d\n", length);
+        DEBUG_PRINTF("Buffer size: %d\n", png.getBufferSize());
         display[screenIndex].activate();
         tft.startWrite();
         uint32_t dt = millis();
@@ -621,11 +621,8 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
         {
             printPngError(png.getLastError());
         }
-#ifdef DEBUG_ON
-
-        Serial.print(millis() - dt);
-        Serial.println("ms");
-#endif
+        DEBUG_PRINT(millis() - dt);
+        DEBUG_PRINTLN("ms");
 
         tft.endWrite();
         display[screenIndex].deActivate();
@@ -711,13 +708,6 @@ void pngDraw(PNGDRAW *pDraw)
     png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, 0xffffffff);
     // png.getLineAsRGB565(pDraw, lineBuffer, PNG_RGB565_BIG_ENDIAN, -1);
     tft.pushImage(xpos, ypos + pDraw->y, pDraw->iWidth, 1, lineBuffer);
-
-    // // Print the buffer contents
-    // for (int i = 0; i < MAX_IMAGE_WIDTH; i++)
-    // {
-    //     Serial.printf("%d", lineBuffer[i]);
-    // }
-    // Serial.println();
 }
 
 void printPngError(int errorCode)
@@ -759,10 +749,8 @@ size_t displayPngImage(const char *imageBase64Png, int displayIndex)
     size_t length = base64::decodeLength(imageBase64Png);
     base64::decode(imageBase64Png, decodedBase64Data);
 
-#ifdef DEBUG_ON
-    Serial.printf("base64 encoded length = %ld\n", strlen(imageBase64Png));
-    Serial.printf("base64 decoded length = %ld\n", length);
-#endif
+    DEBUG_PRINTF("base64 encoded length = %ld\n", strlen(imageBase64Png));
+    DEBUG_PRINTF("base64 decoded length = %ld\n", length);
 
     displayPngFromRam(decodedBase64Data, length, displayIndex);
     return length;
