@@ -48,7 +48,7 @@ const char *IMAGES_FOLDER_NAME = "/images";
 int idForNewFile = 1;
 #endif
 
-#define GIF_IMAGE ai
+#define ANIMATED_AI_IMAGE ai
 AnimatedGIF gif;
 TaskHandle_t taskHandlePlayGif = NULL;
 
@@ -147,9 +147,9 @@ void playAIGif(void *parameter)
     }
 }
 
-void startPlayAIGif(void)
+void startPlayAIGifAsync(void)
 {
-    gif.open((uint8_t *)GIF_IMAGE, sizeof(GIF_IMAGE), GIFDraw);
+    gif.open((uint8_t *)ANIMATED_AI_IMAGE, sizeof(ANIMATED_AI_IMAGE), GIFDraw);
     display[0].activate();
     tft.startWrite();
     if (taskHandlePlayGif == NULL)
@@ -158,7 +158,7 @@ void startPlayAIGif(void)
     }
 }
 
-void stopPlayAIGif(void)
+void stopPlayAIGifAsync(void)
 {
     if (taskHandlePlayGif != NULL)
     {
@@ -367,12 +367,12 @@ void generationSwitchTask(void *parameter)
 void generateAIImages(void)
 {
 #ifdef SIMULE_CALL_DALLE
-    startPlayAIGif();
+    startPlayAIGifAsync();
     unsigned long t = millis();
     while (millis() - t < 5000)
     {
     }
-    stopPlayAIGif();
+    stopPlayAIGifAsync();
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
@@ -504,7 +504,7 @@ size_t genereteDalleImage(char *prompt)
 
 void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 {
-    startPlayAIGif();
+    startPlayAIGifAsync();
     *readBuffer = ""; // Clear the buffer
 
     WiFiClientSecure client;
@@ -517,7 +517,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     {
         // playAIGif();
         Serial.println("!!! Connection failed");
-        stopPlayAIGif();
+        stopPlayAIGifAsync();
         return;
     }
 
@@ -603,7 +603,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
         Serial.println(buffer);
     }
     DEBUG_PRINTLN("Request call completed");
-    stopPlayAIGif();
+    stopPlayAIGifAsync();
 }
 
 void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int screenIndex)
