@@ -49,7 +49,10 @@ const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png
 const int testImagesCount = 4;
 #endif
 
-SimpleRotary rotary(41, 42, 40);
+#define ROTARY_PIN_A 41
+#define ROTARY_PIN_B 42
+#define ROTARY_PUSH_BUTTON 42
+SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);    
 
 #ifdef USE_SD_CARD
 #define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
