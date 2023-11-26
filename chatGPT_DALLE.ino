@@ -19,13 +19,13 @@
 #endif
 
 #ifdef DEBUG_ON
-    #define DEBUG_PRINT(x)    Serial.print(x)
-    #define DEBUG_PRINTLN(x)  Serial.println(x)
-    #define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
+#define DEBUG_PRINT(x) Serial.print(x)
+#define DEBUG_PRINTLN(x) Serial.println(x)
+#define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
 #else
-    #define DEBUG_PRINT(x)
-    #define DEBUG_PRINTLN(x)
-    #define DEBUG_PRINTF(...)
+#define DEBUG_PRINT(x)
+#define DEBUG_PRINTLN(x)
+#define DEBUG_PRINTF(...)
 #endif
 
 #ifdef SIMULE_CALL_DALLE
@@ -104,7 +104,7 @@ void setup()
             // Infinite loop, code execution useless without PSRAM
         }
     }
-    
+
     if (!initDisplay())
     {
         Serial.println("!!! Cannot allocate enough PSRAM to store images");
@@ -113,7 +113,6 @@ void setup()
             // Infinite loop, code execution useless without PSRAM
         }
     }
-
 
 #ifdef USE_SD_CARD
     if (!initSDCard())
@@ -468,9 +467,6 @@ bool initDisplay(void)
         display[i].activate();
         tft.fillScreen(TFT_BLACK);
         tft.setRotation(2); // Adjust Rotation of your screen (0-3)
-        displayPngImage(ready64Png,i);
-        // tft.setCursor(40, 120);
-        // tft.print("Ready!");
         display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
@@ -479,6 +475,14 @@ bool initDisplay(void)
         {
             return false;
         }
+    }
+    delay(5000);
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        size_t length = displayPngImage(ready64Png, i);
+        display[i].storeImage(decodedBase64Data, length);
+
+        delay(300);
     }
     return true;
 }
@@ -537,7 +541,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
         String line = client.readStringUntil('\n');
         if (line == "\r")
         {
-           DEBUG_PRINTLN("headers received");
+            DEBUG_PRINTLN("headers received");
             break;
         }
     }
