@@ -180,6 +180,8 @@ void readRotaryEncoder(void)
     if (i == 2)
     {
         Serial.println("CCW");
+        shifImagesOnDisplayLeft();
+        displayPngFileFromSDCard(1,0);
     }
 }
 
@@ -233,20 +235,19 @@ void stopPlayAIGifAsync(void)
 
 void playAnimatedGIFSync(uint8_t *image, size_t imageSize, int screenIndex)
 {
-    if (!verifyScreenIndex(screenIndex))
+    if (verifyScreenIndex(screenIndex))
     {
-        Serial.printf("Screen index out of bound = %d", screenIndex);
+        gif.open(image, imageSize, GIFDraw);
+        display[screenIndex].activate();
+        tft.startWrite();
+        while (gif.playFrame(true, NULL))
+        {
+            yield();
+        }
+        gif.close();
+        tft.endWrite();
+        display[screenIndex].deActivate();
     }
-    gif.open(image, imageSize, GIFDraw);
-    display[screenIndex].activate();
-    tft.startWrite();
-    while (gif.playFrame(true, NULL))
-    {
-        yield();
-    }
-    gif.close();
-    tft.endWrite();
-    display[screenIndex].deActivate();
 }
 
 TaskHandle_t playAIGifTask()
@@ -548,31 +549,23 @@ void switchImageOnDisplay(int sourceDisplay, int destinationDisplay)
         return;
     }
 
-    if (!verifyScreenIndex(sourceDisplay))
+    if (verifyScreenIndex(sourceDisplay) && verifyScreenIndex(destinationDisplay))
     {
-        Serial.printf("!!! Source display is out of bound (%d)\n", sourceDisplay);
+        if (display[sourceDisplay].imageSize() > 0)
+        {
+            display[destinationDisplay].storeImage(display[sourceDisplay].image(), display[sourceDisplay].imageSize());
+            displayPngFromRam(display[destinationDisplay].image(), display[destinationDisplay].imageSize(), destinationDisplay);
+            display[sourceDisplay].activate();
+            tft.fillScreen(TFT_BLACK);
+            display[sourceDisplay].deActivate();
+        }
+        else
+        {
+            display[destinationDisplay].activate();
+            tft.fillScreen(TFT_BLACK);
+            display[destinationDisplay].deActivate();
+        }
         return;
-    }
-
-    if (!verifyScreenIndex(destinationDisplay))
-    {
-        Serial.printf("!!! Destination display is out of bound (%d)\n", destinationDisplay);
-        return;
-    }
-
-    if (display[sourceDisplay].imageSize() > 0)
-    {
-        display[destinationDisplay].storeImage(display[sourceDisplay].image(), display[sourceDisplay].imageSize());
-        displayPngFromRam(display[destinationDisplay].image(), display[destinationDisplay].imageSize(), destinationDisplay);
-        display[sourceDisplay].activate();
-        tft.fillScreen(TFT_BLACK);
-        display[sourceDisplay].deActivate();
-    }
-    else
-    {
-        display[destinationDisplay].activate();
-        tft.fillScreen(TFT_BLACK);
-        display[destinationDisplay].deActivate();
     }
 }
 
@@ -580,6 +573,7 @@ bool verifyScreenIndex(int screenIndex)
 {
     if (screenIndex < 0 || screenIndex >= NUM_DISPLAYS)
     {
+        Serial.printf("!!! Wrong screen index=%d, must from 0 to %d\n", screenIndex, NUM_DISPLAYS - 1);
         return false;
     }
     return true;
@@ -739,37 +733,35 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 
 void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int screenIndex)
 {
-    if (!verifyScreenIndex(screenIndex))
+    if (verifyScreenIndex(screenIndex))
     {
-        Serial.printf("!!! displayPngFromRam Screen index is out of bound (%d)\n", screenIndex);
-        return;
-    }
-    int res = png.openRAM((uint8_t *)pngImageinC, length, pngDraw);
-    if (res == PNG_SUCCESS)
-    {
-        DEBUG_PRINTLN("Successfully opened png file");
-        DEBUG_PRINTF("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
-        DEBUG_PRINTF("Image size: %d\n", length);
-        DEBUG_PRINTF("Buffer size: %d\n", png.getBufferSize());
-        display[screenIndex].activate();
-        tft.startWrite();
-        uint32_t dt = millis();
-        res = png.decode(NULL, 0);
-        if (res != PNG_SUCCESS)
+        int res = png.openRAM((uint8_t *)pngImageinC, length, pngDraw);
+        if (res == PNG_SUCCESS)
         {
-            printPngError(png.getLastError());
+            DEBUG_PRINTLN("Successfully opened png file");
+            DEBUG_PRINTF("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
+            DEBUG_PRINTF("Image size: %d\n", length);
+            DEBUG_PRINTF("Buffer size: %d\n", png.getBufferSize());
+            display[screenIndex].activate();
+            tft.startWrite();
+            uint32_t dt = millis();
+            res = png.decode(NULL, 0);
+            if (res != PNG_SUCCESS)
+            {
+                printPngError(png.getLastError());
+            }
+            DEBUG_PRINT(millis() - dt);
+            DEBUG_PRINTLN("ms");
+
+            tft.endWrite();
+            display[screenIndex].deActivate();
+
+            // png.close(); // not needed for memory->memory decode
         }
-        DEBUG_PRINT(millis() - dt);
-        DEBUG_PRINTLN("ms");
-
-        tft.endWrite();
-        display[screenIndex].deActivate();
-
-        // png.close(); // not needed for memory->memory decode
-    }
-    else
-    {
-        printPngError(res);
+        else
+        {
+            printPngError(res);
+        }
     }
 }
 
