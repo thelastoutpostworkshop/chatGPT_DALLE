@@ -13,7 +13,7 @@
 #include "images\readyAnimation.h"
 
 // #define SIMULE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-// #define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+#define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -701,14 +701,7 @@ bool allocatePsramMemory(void)
 
 void createTaskCore(void)
 {
-    xTaskCreatePinnedToCore(
-        handleBrowserCalls,   /* Function to implement the task */
-        "handleBrowserCalls", /* Name of the task */
-        10000,                /* Stack size in words */
-        NULL,                 /* Task input parameter */
-        1,                    /* Priority of the task */
-        NULL,                 /* Task handle. */
-        1);                   /* Core where the task should run */
+    /* Core where the task should run */
     xTaskCreatePinnedToCore(
         generationSwitchTask,   /* Function to implement the task */
         "generationSwitchTask", /* Name of the task */
@@ -717,17 +710,6 @@ void createTaskCore(void)
         1,                      /* Priority of the task */
         NULL,                   /* Task handle. */
         1);                     /* Core where the task should run */
-}
-
-// Task for the web browser
-//
-void handleBrowserCalls(void *parameter)
-{
-    for (;;)
-    {
-        server.handleClient();
-        delay(1); // allow other tasks to run
-    }
 }
 
 //=========================================v==========================================
