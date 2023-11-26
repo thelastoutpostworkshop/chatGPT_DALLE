@@ -12,7 +12,7 @@
 #include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
-#define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
+#define SIMULE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULE_CALL_DALLE
