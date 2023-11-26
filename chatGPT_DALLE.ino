@@ -12,7 +12,7 @@
 #include "images\readyPng.h" // Ready PNG
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
-// #define DEBUG_ON          // Comment this line if you don't want detailed messages on the serial monitor, only errors will be printed
+// #define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
