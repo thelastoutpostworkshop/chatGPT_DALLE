@@ -9,7 +9,7 @@
 #include "display.h"
 #include "switch.h"
 #include "images\ai.h" // AI Animated GIF
-// #include "images\readyPng.h" // Ready PNG
+#include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
@@ -51,6 +51,7 @@ int idForNewFile = 1;
 #define ANIMATED_AI_IMAGE ai
 AnimatedGIF gif;
 TaskHandle_t taskHandlePlayGif = NULL;
+void GIFDraw(GIFDRAW *pDraw);
 
 // Switch
 SwitchReader generationSwitch(1);
@@ -170,10 +171,11 @@ void stopPlayAIGifAsync(void)
     display[0].deActivate();
 }
 
-void playAnimatedGIFSync(uint8_t *image, size_t imageSize,int screenIndex)
+void playAnimatedGIFSync(uint8_t *image, size_t imageSize, int screenIndex)
 {
-    if(!verifyScreenIndex(screenIndex)) {
-        Serial.printf("Screen index out of bound = %d",screenIndex);
+    if (!verifyScreenIndex(screenIndex))
+    {
+        Serial.printf("Screen index out of bound = %d", screenIndex);
     }
     gif.open(image, imageSize, GIFDraw);
     display[screenIndex].activate();
@@ -498,10 +500,10 @@ bool initDisplay(void)
     delay(5000);
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        playAnimatedGIFSync((uint8_t *)readyAnimation, sizeof(readyAnimation),i);
-        // size_t length = displayPngImage(ready64Png, i);
-        // display[i].storeImage(decodedBase64Data, length);
-        // delay(300);
+        playAnimatedGIFSync((uint8_t *)readyAnimation, sizeof(readyAnimation), i);
+        size_t length = base64::decodeLength(ready64Png);
+        base64::decode(ready64Png, decodedBase64Data);
+        display[i].storeImage(decodedBase64Data, length);
     }
     return true;
 }
