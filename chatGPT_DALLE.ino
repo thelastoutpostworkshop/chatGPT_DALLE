@@ -136,6 +136,9 @@ void loop()
     if (runImageGeneration)
     {
         generateAIImages();
+        if(!runImageGeneration) {
+            playReadyOnScreens();
+        }
     }
 }
 
