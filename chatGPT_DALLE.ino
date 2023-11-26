@@ -387,6 +387,7 @@ void generateAIImages(void)
     {
     }
     stopPlayAIGifAsync();
+    playAnimatedGIFSync((uint8_t*)transition,sizeof(transition));
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
