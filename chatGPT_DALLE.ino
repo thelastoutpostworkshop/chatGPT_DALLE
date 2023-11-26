@@ -291,13 +291,13 @@ bool initSDCard(void)
     return true;
 }
 
-bool readPNGImage(fs::FS &fs, const char* filename, uint8_t** outBuffer, size_t* outBufferSize) {
+uint8_t* readPNGImage(fs::FS &fs, const char* filename, size_t* imageSize) {
     DEBUG_PRINTLN("Reading PNG Image");
 
     File file = fs.open(filename, FILE_READ);
     if (!file) {
         Serial.println("!!! Failed to open PNG file for reading");
-        return false;
+        return NULL;
     }
 
     // Get the size of the file
@@ -305,7 +305,7 @@ bool readPNGImage(fs::FS &fs, const char* filename, uint8_t** outBuffer, size_t*
     if (fileSize == 0) {
         Serial.println("!!! PNG file is empty");
         file.close();
-        return false;
+        return NULL;
     }
 
     // Allocate memory for the file content
@@ -313,7 +313,7 @@ bool readPNGImage(fs::FS &fs, const char* filename, uint8_t** outBuffer, size_t*
     if (!buffer) {
         Serial.println("!!! Failed to allocate memory for PNG image");
         file.close();
-        return false;
+        return NULL;
     }
 
     // Read the file into the buffer
@@ -323,14 +323,13 @@ bool readPNGImage(fs::FS &fs, const char* filename, uint8_t** outBuffer, size_t*
     if (bytesRead != fileSize) {
         Serial.println("!!! Failed to read the entire PNG file");
         delete[] buffer;
-        return false;
+        return NULL;
     }
 
     // Set the output parameters
-    *outBuffer = buffer;
-    *outBufferSize = fileSize;
+    *imageSize = fileSize;
 
-    return true;
+    return buffer;
 }
 
 
