@@ -57,6 +57,7 @@ const int testImagesCount = 4;
 #define ROTARY_PIN_B 42
 #define ROTARY_PUSH_BUTTON 42
 SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);
+int currentSDCardFileIndex = 1;
 #endif
 
 #ifdef USE_SD_CARD
@@ -179,9 +180,13 @@ void readRotaryEncoder(void)
 
     if (i == 2)
     {
+        currentSDCardFileIndex -= 1;
+        if(currentSDCardFileIndex <= 0) {
+            currentSDCardFileIndex = idForNewFile-1;
+        }
         Serial.println("CCW");
         shifImagesOnDisplayLeft();
-        displayPngFileFromSDCard(1,0);
+        displayPngFileFromSDCard(currentSDCardFileIndex,0);
     }
 }
 
