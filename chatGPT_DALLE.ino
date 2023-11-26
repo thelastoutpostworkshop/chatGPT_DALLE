@@ -96,7 +96,6 @@ void setup()
 {
     Serial.begin(115200);
     connectToWifiNetwork();
-    createTaskCore();
     gif.begin(BIG_ENDIAN_PIXELS);
 
     if (!allocatePsramMemory())
@@ -129,6 +128,7 @@ void setup()
     createDir(SD, IMAGES_FOLDER_NAME);
 
 #endif
+    createTaskCore();
 }
 
 void loop()
