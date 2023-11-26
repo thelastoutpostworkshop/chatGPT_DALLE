@@ -3,8 +3,8 @@
                          // Don't forget to configure the driver for your display!
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 #include <SD.h>
-#include "WebServer.h"
 #include <WiFiClientSecure.h>
+#include "secrets.h"
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
@@ -95,7 +95,7 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
-    initWebServer();
+    connectToWifiNetwork();
     createTaskCore();
     gif.begin(BIG_ENDIAN_PIXELS);
 
@@ -790,4 +790,23 @@ long myRandom(long howsmall, long howbig)
     }
     long diff = howbig - howsmall;
     return esp_random() % diff + howsmall;
+}
+
+void connectToWifiNetwork()
+{
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+    Serial.println("");
+
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(100);
+        Serial.print(".");
+    }
+
+    Serial.println("");
+    Serial.print("Connected to ");
+    Serial.println(ssid);
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
 }
