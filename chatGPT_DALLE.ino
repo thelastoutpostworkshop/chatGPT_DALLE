@@ -93,7 +93,7 @@ Display display[NUM_DISPLAYS] = {
     Display(6),
     Display(16)};
 
-TFT_eSPI tft = TFT_eSPI();
+TFT_eSPI tft = TFT_eSPI(); // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display if on a breadboard
 
 // uint8_t output[50000L];
 String base64Data;          // String buffer for base64 encoded Data
@@ -102,20 +102,6 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
-
-#ifdef USE_SD_CARD
-    if (!initSDCard())
-    {
-        while (true)
-        {
-            // Infinite loop, code execution useless without PSRAM
-        }
-    }
-    idForNewFile = readNextId(SD) + 1;
-    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
-    createDir(SD, IMAGES_FOLDER_NAME);
-
-#endif
 
     connectToWifiNetwork();
     gif.begin(BIG_ENDIAN_PIXELS);
@@ -136,7 +122,19 @@ void setup()
             // Infinite loop, code execution useless without PSRAM
         }
     }
+#ifdef USE_SD_CARD
+    if (!initSDCard())
+    {
+        while (true)
+        {
+            // Infinite loop, code execution useless without PSRAM
+        }
+    }
+    idForNewFile = readNextId(SD) + 1;
+    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
+    createDir(SD, IMAGES_FOLDER_NAME);
 
+#endif
     createTaskCore();
 }
 
@@ -220,7 +218,6 @@ TaskHandle_t playAIGifTask()
 // Initialize Micro SD card Module
 bool initSDCard(void)
 {
-    // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display
     if (!SD.begin(SD_CARD_CS_PIN))
     {
         // You can get this error if no Micro SD card is inserted into the module
