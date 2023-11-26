@@ -168,8 +168,7 @@ void loop()
 void readRotaryEncoder(void)
 {
     byte i;
-    size_t imageSize;
-    const uint8_t *image = NULL;
+
     // 0 = not turning, 1 = CW, 2 = CCW
     i = rotary.rotate();
 
@@ -181,12 +180,21 @@ void readRotaryEncoder(void)
     if (i == 2)
     {
         Serial.println("CCW");
+    }
+}
+
+void displayPngFileFromSDCard(int fileIndex, int screenIndex)
+{
+    size_t imageSize;
+    const uint8_t *image = NULL;
+    if (verifyScreenIndex(screenIndex))
+    {
         String filename = String(IMAGES_FOLDER_NAME) + "/" + String(1) + ".png";
         image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
         if (image != NULL)
         {
-            displayPngFromRam(image,imageSize,0);
-            display[0].storeImage((uint8_t*)image, imageSize);
+            displayPngFromRam(image, imageSize, 0);
+            display[0].storeImage((uint8_t *)image, imageSize);
         }
     }
 }
