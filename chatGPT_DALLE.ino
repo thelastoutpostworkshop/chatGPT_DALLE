@@ -197,6 +197,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
     if (verifyScreenIndex(screenIndex))
     {
         String filename = String(IMAGES_FOLDER_NAME) + "/" + String(fileIndex) + ".png";
+        DEBUG_PRINTF("Reading %s from SD Card\n",filename.c_str());
         image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
         if (image != NULL)
         {
