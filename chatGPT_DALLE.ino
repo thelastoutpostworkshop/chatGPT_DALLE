@@ -169,15 +169,20 @@ void readRotaryEncoder(void)
 {
     byte i;
     size_t imageSize;
-    uint8_t *image;
+    const uint8_t *image = NULL;
     // 0 = not turning, 1 = CW, 2 = CCW
     i = rotary.rotate();
 
     if (i == 1)
     {
-        String filename = String(IMAGES_FOLDER_NAME) + "/" + String(1) + ".png";
-        readPNGImageFromSDCard(filename.c_str(),&imageSize);
         Serial.println("CW");
+        String filename = String(IMAGES_FOLDER_NAME) + "/" + String(1) + ".png";
+        image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
+        if (image != NULL)
+        {
+            size_t length = displayPngImage((const char *)image, 0);
+            display[0].storeImage(decodedBase64Data, length);
+        }
     }
 
     if (i == 2)
