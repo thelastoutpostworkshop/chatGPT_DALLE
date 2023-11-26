@@ -2,6 +2,8 @@
 // PSRAM is needed for this project.
 // The round display (https://amzn.to/3L4pud6) use the GC9A01 driver from the TFT_eSPI library
 // The Micro SD Card Module (optional) is this one : https://amzn.to/46tSgvn
+//
+// See the full tutorial here : 
 
 #include <PNGdec.h>      // Install this library with the Arduino IDE Library Manager
 #include <TFT_eSPI.h>    // Install this library with the Arduino IDE Library Manager
