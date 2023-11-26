@@ -170,6 +170,20 @@ void stopPlayAIGifAsync(void)
     display[0].deActivate();
 }
 
+void playAnimatedGIFSync(uint8_t *image, size_t imageSize)
+{
+    gif.open(image, imageSize, GIFDraw);
+    display[0].activate();
+    tft.startWrite();
+    while (gif.playFrame(true, NULL))
+    {
+        yield();
+    }
+    gif.close();
+    tft.endWrite();
+    display[0].deActivate();
+}
+
 TaskHandle_t playAIGifTask()
 {
     TaskHandle_t taskHandle = NULL;
