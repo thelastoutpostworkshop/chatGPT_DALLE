@@ -8,9 +8,9 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
-#include "images\ai.h"       // AI Animated GIF
-#include "images\readyPng.h" // Ready PNG
-#include "images\transition.h"
+#include "images\ai.h" // AI Animated GIF
+// #include "images\readyPng.h" // Ready PNG
+#include "images\readyAnimation.h"
 
 #define SIMULE_CALL_DALLE // Uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON       // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
@@ -170,10 +170,13 @@ void stopPlayAIGifAsync(void)
     display[0].deActivate();
 }
 
-void playAnimatedGIFSync(uint8_t *image, size_t imageSize)
+void playAnimatedGIFSync(uint8_t *image, size_t imageSize,int screenIndex)
 {
+    if(!verifyScreenIndex(screenIndex)) {
+        Serial.printf("Screen index out of bound = %d",screenIndex);
+    }
     gif.open(image, imageSize, GIFDraw);
-    display[0].activate();
+    display[screenIndex].activate();
     tft.startWrite();
     while (gif.playFrame(true, NULL))
     {
@@ -181,7 +184,7 @@ void playAnimatedGIFSync(uint8_t *image, size_t imageSize)
     }
     gif.close();
     tft.endWrite();
-    display[0].deActivate();
+    display[screenIndex].deActivate();
 }
 
 TaskHandle_t playAIGifTask()
@@ -387,7 +390,7 @@ void generateAIImages(void)
     {
     }
     stopPlayAIGifAsync();
-    playAnimatedGIFSync((uint8_t*)transition,sizeof(transition));
+    // playAnimatedGIFSync((uint8_t*)transition,sizeof(transition));
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
@@ -495,10 +498,10 @@ bool initDisplay(void)
     delay(5000);
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        size_t length = displayPngImage(ready64Png, i);
-        display[i].storeImage(decodedBase64Data, length);
-
-        delay(300);
+        playAnimatedGIFSync((uint8_t *)readyAnimation, sizeof(readyAnimation),i);
+        // size_t length = displayPngImage(ready64Png, i);
+        // display[i].storeImage(decodedBase64Data, length);
+        // delay(300);
     }
     return true;
 }
