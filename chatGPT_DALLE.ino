@@ -138,7 +138,7 @@ void setup()
     {
         while (true)
         {
-            // Infinite loop, code execution useless without PSRAM
+            // Infinite loop, code execution useless without SD Card Module
         }
     }
     idForNewFile = readNextId(SD) + 1;
