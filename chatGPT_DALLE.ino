@@ -6,13 +6,13 @@
 //
 // See the full tutorial here :
 
-#include <PNGdec.h>             // Install this library with the Arduino IDE Library Manager
-#include <TFT_eSPI.h>           // Install this library with the Arduino IDE Library Manager
-                                    // Don't forget to configure the driver for your display!
-#include <AnimatedGIF.h>        // Install this library with the Arduino IDE Library Manager
-#include <SimpleRotary.h>       // Install this library with the Arduino IDE Library Manager
-#include <SD.h>                 // Install this library with the Arduino IDE Library Manager
-#include <WiFiClientSecure.h>   // Install this library with the Arduino IDE Library Manager
+#include <PNGdec.h>           // Install this library with the Arduino IDE Library Manager
+#include <TFT_eSPI.h>         // Install this library with the Arduino IDE Library Manager
+                              // Don't forget to configure the driver for your display!
+#include <AnimatedGIF.h>      // Install this library with the Arduino IDE Library Manager
+#include <SimpleRotary.h>     // Install this library with the Arduino IDE Library Manager
+#include <SD.h>               // Install this library with the Arduino IDE Library Manager
+#include <WiFiClientSecure.h> // Install this library with the Arduino IDE Library Manager
 #include "secrets.h"
 #include "arduino_base64.hpp"
 #include "display.h"
@@ -22,11 +22,13 @@
 #include "images\readyAnimation.h"
 
 #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+#define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
 #endif
+
+#define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder
 
 #ifdef DEBUG_ON
 #define DEBUG_PRINT(x) Serial.print(x)
@@ -50,10 +52,12 @@ const char *testPngImages[] = {mandalaBase64Png, resistance64Png, spaceship64Png
 const int testImagesCount = 4;
 #endif
 
+#ifdef USE_ROTARY_ENCODER
 #define ROTARY_PIN_A 41
 #define ROTARY_PIN_B 42
 #define ROTARY_PUSH_BUTTON 42
-SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);    
+SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);
+#endif
 
 #ifdef USE_SD_CARD
 #define SD_CARD_CS_PIN 9 // Chip Select Pin for the SD Card Module
