@@ -8,7 +8,7 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
-#include "images\ai.h" // AI Animated GIF
+#include "images\ai.h"       // AI Animated GIF
 #include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
@@ -498,6 +498,12 @@ bool initDisplay(void)
         }
     }
     delay(5000);
+    playReadyOnScreens();
+    return true;
+}
+
+void playReadyOnScreens(void)
+{
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         playAnimatedGIFSync((uint8_t *)readyAnimation, sizeof(readyAnimation), i);
@@ -505,7 +511,6 @@ bool initDisplay(void)
         base64::decode(ready64Png, decodedBase64Data);
         display[i].storeImage(decodedBase64Data, length);
     }
-    return true;
 }
 
 size_t generateDalleImageRandomPrompt(void)
