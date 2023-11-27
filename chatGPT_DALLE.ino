@@ -114,21 +114,6 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
-    tft.init(BIG_ENDIAN_PIXELS);
-
-#ifdef USE_SD_CARD
-    if (!initSDCard())
-    {
-        while (true)
-        {
-            // Infinite loop, code execution useless without SD Card Module
-        }
-    }
-    idForNewFile = readNextId(SD) + 1;
-    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
-    createDir(SD, IMAGES_FOLDER_NAME);
-    currentSDCardFileIndex = idForNewFile;
-#endif
 
     connectToWifiNetwork();
     gif.begin(BIG_ENDIAN_PIXELS);
@@ -151,6 +136,20 @@ void setup()
             // Infinite loop, code execution useless without PSRAM
         }
     }
+#ifdef USE_SD_CARD
+    if (!initSDCard())
+    {
+        Serial.println("!!! Code Execution stopped!");
+        while (true)
+        {
+            // Infinite loop, code execution useless without SD Card Module
+        }
+    }
+    idForNewFile = readNextId(SD) + 1;
+    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
+    createDir(SD, IMAGES_FOLDER_NAME);
+    currentSDCardFileIndex = idForNewFile;
+#endif
     createTaskCore();
 }
 
@@ -615,6 +614,7 @@ bool verifyScreenIndex(int screenIndex)
 
 bool initDisplay(void)
 {
+    tft.init(BIG_ENDIAN_PIXELS);
     tft.setFreeFont(&FreeMono24pt7b);
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
