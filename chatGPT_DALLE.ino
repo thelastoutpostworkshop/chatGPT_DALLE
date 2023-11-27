@@ -61,7 +61,7 @@ int currentSDCardFileIndex = 1;
 #endif
 
 #ifdef USE_SD_CARD
-#define SD_CARD_CS_PIN 3 // Chip Select Pin for the SD Card Module
+#define SD_CARD_CS_PIN 5 // Chip Select Pin for the SD Card Module
 const char *ID_FILENAME = "id.txt";
 const char *IMAGES_FOLDER_NAME = "/images";
 int idForNewFile = 1;
@@ -300,6 +300,8 @@ TaskHandle_t playAIGifTask()
 // Initialize Micro SD card Module
 bool initSDCard(void)
 {
+    pinMode(SD_CARD_CS_PIN,OUTPUT);
+    digitalWrite(SD_CARD_CS_PIN,HIGH);
     if (!SD.begin(SD_CARD_CS_PIN))
     {
         // You can get this error if no Micro SD card is inserted into the module
