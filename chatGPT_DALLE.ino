@@ -180,14 +180,39 @@ void readRotaryEncoder(void)
 
     if (i == 2)
     {
-        currentSDCardFileIndex -= 1;
-        if(currentSDCardFileIndex <= 0) {
-            currentSDCardFileIndex = idForNewFile-1;
-        }
         DEBUG_PRINTLN("Counter Clockwise");
-        shifImagesOnDisplayLeft();
-        displayPngFileFromSDCard(currentSDCardFileIndex,0);
+        currentSDCardFileIndex = idForNewFile;
+        currentSDCardFileIndex = findPreviousFileIndexOnSDCard(currentSDCardFileIndex);
+        if (currentSDCardFileIndex != 0)
+        {
+            shifImagesOnDisplayLeft();
+            displayPngFileFromSDCard(currentSDCardFileIndex, 0);
+        }
+        else
+        {
+            DEBUG_PRINTLN("No Previous Files");
+            currentSDCardFileIndex = idForNewFile;
+        }
     }
+}
+
+int findPreviousFileIndexOnSDCard(int fileIndex)
+{
+    fileIndex -= 1;
+    while (fileIndex > 0)
+    {
+        String filename = String(IMAGES_FOLDER_NAME) + "/" + String(fileIndex) + ".png";
+        if (!SD.exists(filename))
+        {
+            fileIndex -= 1;
+        }
+        else
+        {
+            return fileIndex;
+        }
+    }
+
+    return 0; // No more previous files
 }
 
 void displayPngFileFromSDCard(int fileIndex, int screenIndex)
@@ -197,7 +222,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
     if (verifyScreenIndex(screenIndex))
     {
         String filename = String(IMAGES_FOLDER_NAME) + "/" + String(fileIndex) + ".png";
-        DEBUG_PRINTF("Reading %s from SD Card\n",filename.c_str());
+        DEBUG_PRINTF("Reading %s from SD Card\n", filename.c_str());
         image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
         if (image != NULL)
         {
