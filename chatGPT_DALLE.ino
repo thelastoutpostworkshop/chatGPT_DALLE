@@ -135,6 +135,7 @@ void setup()
 
     if (!allocatePsramMemory())
     {
+        Serial.println("!!! Code Execution stopped!");
         while (true)
         {
             // Infinite loop, code execution useless without PSRAM
@@ -144,6 +145,7 @@ void setup()
     if (!initDisplay())
     {
         Serial.println("!!! Cannot allocate enough PSRAM to store images");
+        Serial.println("!!! Code Execution stopped!");
         while (true)
         {
             // Infinite loop, code execution useless without PSRAM
