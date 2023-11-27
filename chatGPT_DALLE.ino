@@ -114,9 +114,6 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
-    pinMode(SD_CARD_CS_PIN,OUTPUT);
-    digitalWrite(SD_CARD_CS_PIN,HIGH);
-
     connectToWifiNetwork();
     gif.begin(BIG_ENDIAN_PIXELS);
 
