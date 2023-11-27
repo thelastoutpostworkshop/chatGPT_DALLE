@@ -114,6 +114,7 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
+    tft.init(BIG_ENDIAN_PIXELS);
 
 #ifdef USE_SD_CARD
     if (!initSDCard())
@@ -613,7 +614,6 @@ bool verifyScreenIndex(int screenIndex)
 
 bool initDisplay(void)
 {
-    tft.init(BIG_ENDIAN_PIXELS);
     tft.setFreeFont(&FreeMono24pt7b);
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
