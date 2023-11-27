@@ -13,6 +13,7 @@ public:
         : csPin(pin), storedImage(NULL), size(0)
     {
         pinMode(csPin, OUTPUT);
+        deActivate();
     }
 
     bool reserveMemoryForStorage(void)
