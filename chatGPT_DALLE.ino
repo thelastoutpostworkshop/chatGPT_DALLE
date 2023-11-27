@@ -127,7 +127,7 @@ void setup()
     idForNewFile = readNextId(SD) + 1;
     DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
     createDir(SD, IMAGES_FOLDER_NAME);
-
+    currentSDCardFileIndex = idForNewFile;
 #endif
 
     connectToWifiNetwork();
@@ -183,7 +183,6 @@ void readRotaryEncoder(void)
     if (i == 2)
     {
         DEBUG_PRINTLN("Counter Clockwise");
-        currentSDCardFileIndex = idForNewFile;
         currentSDCardFileIndex = findPreviousFileIndexOnSDCard(currentSDCardFileIndex);
         if (currentSDCardFileIndex != 0)
         {
