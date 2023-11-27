@@ -115,6 +115,20 @@ void setup()
 {
     Serial.begin(115200);
 
+#ifdef USE_SD_CARD
+    if (!initSDCard())
+    {
+        while (true)
+        {
+            // Infinite loop, code execution useless without SD Card Module
+        }
+    }
+    idForNewFile = readNextId(SD) + 1;
+    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
+    createDir(SD, IMAGES_FOLDER_NAME);
+
+#endif
+
     connectToWifiNetwork();
     gif.begin(BIG_ENDIAN_PIXELS);
 
@@ -134,19 +148,6 @@ void setup()
             // Infinite loop, code execution useless without PSRAM
         }
     }
-#ifdef USE_SD_CARD
-    if (!initSDCard())
-    {
-        while (true)
-        {
-            // Infinite loop, code execution useless without SD Card Module
-        }
-    }
-    idForNewFile = readNextId(SD) + 1;
-    DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
-    createDir(SD, IMAGES_FOLDER_NAME);
-
-#endif
     createTaskCore();
 }
 
