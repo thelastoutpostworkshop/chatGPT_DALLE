@@ -98,6 +98,7 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 
 // Display - You must disable chip select pin definitions in the user_setup.h and the driver setup (ex.: Setup46_GC9A01_ESP32.h)
+TFT_eSPI tft = TFT_eSPI(); // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display if on a breadboard
 const int NUM_DISPLAYS = 4; // Adjust this value based on the number of displays
 Display display[NUM_DISPLAYS] = {
     Display(15), // Assign a chip select pin for each display
@@ -105,7 +106,6 @@ Display display[NUM_DISPLAYS] = {
     Display(6),
     Display(16)};
 
-TFT_eSPI tft = TFT_eSPI(); // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display if on a breadboard
 
 // uint8_t output[50000L];
 String base64Data;          // String buffer for base64 encoded Data
@@ -114,6 +114,8 @@ uint8_t *decodedBase64Data; // Buffer to decode base64 data
 void setup()
 {
     Serial.begin(115200);
+    pinMode(SD_CARD_CS_PIN,OUTPUT);
+    digitalWrite(SD_CARD_CS_PIN,HIGH);
 
     connectToWifiNetwork();
     gif.begin(BIG_ENDIAN_PIXELS);
