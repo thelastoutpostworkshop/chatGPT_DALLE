@@ -158,6 +158,7 @@ void loop()
     if (runImageGeneration)
     {
         generateAIImages();
+        currentSDCardFileIndex = idForNewFile;
         if (!runImageGeneration)
         {
             playReadyOnScreens();
@@ -230,6 +231,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
         {
             displayPngFromRam(image, imageSize, 0);
             display[0].storeImage((uint8_t *)image, imageSize);
+            delete image; // delete buffer for image 
         }
     }
 }
