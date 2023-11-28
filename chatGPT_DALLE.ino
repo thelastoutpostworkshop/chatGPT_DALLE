@@ -149,6 +149,7 @@ void setup()
     currentSDCardFileIndex = idForNewFile;
 #endif
     createTaskCore();
+    delay(500);
     playReadyOnScreens();
 }
 
@@ -622,7 +623,8 @@ bool initDisplayPinsAndStorage(void)
     {
         pinMode(display[i].chipSelectPin(), OUTPUT);
         display[i].activate();
-        tft.fillScreen(TFT_WHITE);
+        tft.setRotation(2);  // Adjust orientation as needed (0-3)
+        tft.fillScreen(TFT_BLACK);
         display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
