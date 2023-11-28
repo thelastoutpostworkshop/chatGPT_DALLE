@@ -180,6 +180,17 @@ void readRotaryEncoder(void)
     if (i == 1)
     {
         DEBUG_PRINTLN("Clockwise");
+        currentSDCardFileIndex = findNextFileIndexOnSDCard(currentSDCardFileIndex);
+        if (currentSDCardFileIndex != 0)
+        {
+            shifImagesOnDisplayRight();
+            displayPngFileFromSDCard(currentSDCardFileIndex, NUM_DISPLAYS-1);
+        }
+        else
+        {
+            DEBUG_PRINTLN("No Previous Files");
+            currentSDCardFileIndex = idForNewFile;
+        }
     }
 
     if (i == 2)
@@ -217,6 +228,24 @@ int findPreviousFileIndexOnSDCard(int fileIndex)
 
     return 0; // No more previous files
 }
+int findNextFileIndexOnSDCard(int fileIndex)
+{
+    fileIndex += 1;
+    while (fileIndex >= idForNewFile)
+    {
+        String filename = String(IMAGES_FOLDER_NAME) + "/" + String(fileIndex) + ".png";
+        if (!SD.exists(filename))
+        {
+            fileIndex += 1;
+        }
+        else
+        {
+            return fileIndex;
+        }
+    }
+
+    return 0; // No more previous files
+}
 
 void displayPngFileFromSDCard(int fileIndex, int screenIndex)
 {
@@ -231,7 +260,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
         {
             displayPngFromRam(image, imageSize, 0);
             display[0].storeImage((uint8_t *)image, imageSize);
-            delete image; // delete buffer for image 
+            delete image; // delete buffer for image
         }
     }
 }
@@ -567,15 +596,18 @@ void shifImagesOnDisplayLeft(void)
         }
         switchImageOnDisplay(displaySource, i);
     }
+}
 
-    // for (int i = 0; i < NUM_DISPLAYS; i++)
-    // {
-    //     int nextDisplay = i + 1;
-    //     if (nextDisplay < NUM_DISPLAYS)
-    //     {
-    //         shiftImageOnDisplay(i, nextDisplay);
-    //     }
-    // }
+void shifImagesOnDisplayRight(void)
+{
+    for (int i = 0; i < NUM_DISPLAYS; i++)
+    {
+        int nextDisplay = i + 1;
+        if (nextDisplay < NUM_DISPLAYS)
+        {
+            switchImageOnDisplay(i, nextDisplay);
+        }
+    }
 }
 
 void switchImageOnDisplay(int sourceDisplay, int destinationDisplay)
@@ -625,7 +657,7 @@ bool initDisplayPinsAndStorage(void)
     {
         pinMode(display[i].chipSelectPin(), OUTPUT);
         display[i].activate();
-        tft.setRotation(2);  // Adjust orientation as needed (0-3)
+        tft.setRotation(2); // Adjust orientation as needed (0-3)
         tft.fillScreen(TFT_BLACK);
         display[i].deActivate();
     }
