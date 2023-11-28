@@ -98,14 +98,13 @@ int16_t ypos = 0;
 PNG png; // PNG decoder instance
 
 // Display - You must disable chip select pin definitions in the user_setup.h and the driver setup (ex.: Setup46_GC9A01_ESP32.h)
-TFT_eSPI tft = TFT_eSPI(); // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display if on a breadboard
+TFT_eSPI tft = TFT_eSPI();  // Make sure SPI_FREQUENCY is 20000000 in your TFT_eSPI driver for your display if on a breadboard
 const int NUM_DISPLAYS = 4; // Adjust this value based on the number of displays
 Display display[NUM_DISPLAYS] = {
     Display(15), // Assign a chip select pin for each display
     Display(7),
     Display(6),
     Display(16)};
-
 
 // uint8_t output[50000L];
 String base64Data;          // String buffer for base64 encoded Data
@@ -115,6 +114,15 @@ void setup()
 {
     Serial.begin(115200);
     connectToWifiNetwork();
+    if (!initDisplayPinsAndStorage())
+    {
+        Serial.println("!!! Cannot allocate enough PSRAM to store images");
+        Serial.println("!!! Code Execution stopped!");
+        while (true)
+        {
+            // Infinite loop, code execution useless without PSRAM
+        }
+    }
     gif.begin(BIG_ENDIAN_PIXELS);
 
     if (!allocatePsramMemory())
@@ -126,15 +134,6 @@ void setup()
         }
     }
 
-    if (!initDisplay())
-    {
-        Serial.println("!!! Cannot allocate enough PSRAM to store images");
-        Serial.println("!!! Code Execution stopped!");
-        while (true)
-        {
-            // Infinite loop, code execution useless without PSRAM
-        }
-    }
 #ifdef USE_SD_CARD
     if (!initSDCard())
     {
@@ -150,6 +149,7 @@ void setup()
     currentSDCardFileIndex = idForNewFile;
 #endif
     createTaskCore();
+    playReadyOnScreens();
 }
 
 void loop()
@@ -300,8 +300,8 @@ TaskHandle_t playAIGifTask()
 // Initialize Micro SD card Module
 bool initSDCard(void)
 {
-    pinMode(SD_CARD_CS_PIN,OUTPUT);
-    digitalWrite(SD_CARD_CS_PIN,HIGH);
+    pinMode(SD_CARD_CS_PIN, OUTPUT);
+    digitalWrite(SD_CARD_CS_PIN, HIGH);
     if (!SD.begin(SD_CARD_CS_PIN))
     {
         // You can get this error if no Micro SD card is inserted into the module
@@ -613,15 +613,16 @@ bool verifyScreenIndex(int screenIndex)
     return true;
 }
 
-bool initDisplay(void)
+bool initDisplayPinsAndStorage(void)
 {
-    tft.init(BIG_ENDIAN_PIXELS);
+    tft.init();
     tft.setFreeFont(&FreeMono24pt7b);
+
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
+        pinMode(display[i].chipSelectPin(), OUTPUT);
         display[i].activate();
-        tft.fillScreen(TFT_BLACK);
-        tft.setRotation(2); // Adjust Rotation of your screen (0-3)
+        tft.fillScreen(TFT_WHITE);
         display[i].deActivate();
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
@@ -631,8 +632,6 @@ bool initDisplay(void)
             return false;
         }
     }
-    delay(5000);
-    playReadyOnScreens();
     return true;
 }
 

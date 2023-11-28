@@ -12,7 +12,6 @@ public:
     Display(int pin)
         : csPin(pin), storedImage(NULL), size(0)
     {
-        pinMode(csPin, OUTPUT);
     }
 
     bool reserveMemoryForStorage(void)
@@ -41,6 +40,11 @@ public:
     void deActivate(void)
     {
         digitalWrite(csPin, HIGH);
+    }
+
+    int chipSelectPin() const
+    {
+        return csPin;
     }
 
     size_t imageSize() const
