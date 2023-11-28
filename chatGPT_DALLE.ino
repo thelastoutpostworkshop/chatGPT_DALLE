@@ -149,7 +149,7 @@ void setup()
     currentSDCardFileIndex = idForNewFile;
 #endif
     createTaskCore();
-    delay(500);
+    delay(5000); // You can safely remove this delay
     playReadyOnScreens();
 }
 
