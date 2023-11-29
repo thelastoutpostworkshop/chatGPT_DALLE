@@ -21,8 +21,8 @@
 #include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
-#define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+// #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
+// #define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -704,6 +704,10 @@ size_t generateDalleImageRandomPrompt(void)
 // Call DALLE to generate an image using a prompte
 size_t genereteDalleImage(char *prompt)
 {
+    display[0].activate();
+    tft.setCursor(10,10);
+    tft.print(prompt);
+    display[0].deActivate();
     callOpenAIAPIDalle(&base64Data, prompt);
     size_t length = displayPngImage(base64Data.c_str(), 0);
 
