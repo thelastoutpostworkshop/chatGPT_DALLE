@@ -559,7 +559,7 @@ void generationSwitchTask(void *parameter)
     }
 }
 
-// Start the generation of images to show on the screens
+// Generate an image on a screen
 void generateAIImages(void)
 {
 #ifdef SIMULATE_CALL_DALLE // Test images are used instead of calling the DALLE API
