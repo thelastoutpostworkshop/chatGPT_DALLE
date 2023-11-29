@@ -188,33 +188,17 @@ void readRotaryEncoder(void)
     if (i == 1)
     {
         DEBUG_PRINTLN("Clockwise");
-        currentSDCardFileIndex = findNextFileIndexOnSDCard(currentSDCardFileIndex);
-        if (currentSDCardFileIndex != 0)
-        {
-            shifImagesOnDisplayRight();
-            displayPngFileFromSDCard(currentSDCardFileIndex, NUM_DISPLAYS - 1);
-        }
-        else
-        {
-            DEBUG_PRINTLN("No Next Files");
-            currentSDCardFileIndex = idForNewFile;
-        }
+        currentSDCardFileIndex = findPreviousFileIndexOnSDCard(display[NUM_DISPLAYS - 1].fileIndex);
+        shifImagesOnDisplayRight();
+        displayPngFileFromSDCard(currentSDCardFileIndex, NUM_DISPLAYS - 1);
     }
 
     if (i == 2)
     {
         DEBUG_PRINTLN("Counter Clockwise");
-        currentSDCardFileIndex = findPreviousFileIndexOnSDCard(currentSDCardFileIndex);
-        if (currentSDCardFileIndex != 0)
-        {
-            shifImagesOnDisplayLeft();
-            displayPngFileFromSDCard(currentSDCardFileIndex, 0);
-        }
-        else
-        {
-            DEBUG_PRINTLN("No Previous Files");
-            currentSDCardFileIndex = idForNewFile;
-        }
+        currentSDCardFileIndex = findNextFileIndexOnSDCard(display[0].fileIndex);
+        shifImagesOnDisplayLeft();
+        displayPngFileFromSDCard(currentSDCardFileIndex, 0);
     }
 }
 
@@ -268,6 +252,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
         {
             displayPngFromRam(image, imageSize, screenIndex);
             display[screenIndex].storeImage((uint8_t *)image, imageSize);
+            display[screenIndex].fileIndex = fileIndex;
             delete image; // delete buffer for image
         }
     }

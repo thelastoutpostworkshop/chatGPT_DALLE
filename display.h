@@ -6,11 +6,11 @@ private:
     int csPin;            // Chip Select pin
     uint8_t *storedImage; // Pointer to the stored image in decoded format
     size_t size;          // Size of image, length = 0 indicate no image
-
 public:
+    unsigned int fileIndex; // File index of image displayed from SD card, 0 = not read from SD Card
     // Constructor
     Display(int pin)
-        : csPin(pin), storedImage(NULL), size(0)
+        : csPin(pin), storedImage(NULL), size(0), fileIndex(0)
     {
     }
 
