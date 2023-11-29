@@ -185,8 +185,6 @@ void loop()
 void readRotaryEncoder(void)
 {
     byte i;
-
-    // 0 = not turning, 1 = CW, 2 = CCW
     i = rotary.rotate();
 
     if (i == 1)
