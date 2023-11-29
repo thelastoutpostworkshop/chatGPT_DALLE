@@ -533,7 +533,7 @@ unsigned int countFilesInDirectory(const char *dirPath)
     }
 
     dir.close();
-    DEBUG_PRINTF("Number of images on SD card=%u\n",fileCount);
+    DEBUG_PRINTF("Number of images on SD card=%u\n", fileCount);
     return fileCount;
 }
 #endif
