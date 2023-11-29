@@ -662,7 +662,7 @@ bool verifyScreenIndex(int screenIndex)
 bool initDisplayPinsAndStorage(void)
 {
     tft.init();
-    tft.setFreeFont(&FreeMono24pt7b);
+    tft.setFreeFont(&FreeMono9pt7b);
 
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
