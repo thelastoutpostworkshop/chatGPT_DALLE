@@ -107,7 +107,6 @@ Display display[NUM_DISPLAYS] = {
     Display(6),
     Display(16)};
 
-// uint8_t output[50000L];
 String base64Data;          // String buffer for base64 encoded Data
 uint8_t *decodedBase64Data; // Buffer to decode base64 data
 
