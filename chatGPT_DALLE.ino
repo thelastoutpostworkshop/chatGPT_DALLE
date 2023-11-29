@@ -28,7 +28,9 @@
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
 #endif
 
-#define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder
+#ifdef USE_SD_CARD
+#define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
+#endif
 
 #ifdef DEBUG_ON
 #define DEBUG_PRINT(x) Serial.print(x)
@@ -164,6 +166,7 @@ void loop()
             playReadyOnScreens();
         }
     }
+#ifdef USE_ROTARY_ENCODER
     else
     {
         if (nbfOfimagesOnSdCard > NUM_DISPLAYS - 1)
@@ -175,8 +178,10 @@ void loop()
             Serial.printf("Not enough images on SD Card = %u\n", nbfOfimagesOnSdCard);
         }
     }
+#endif
 }
 
+#ifdef USE_ROTARY_ENCODER
 void readRotaryEncoder(void)
 {
     byte i;
@@ -256,7 +261,10 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
         }
     }
 }
+#endif
 
+// Play an animated GIF asynchronously using a CPU Task
+// This function is called by the task playAIGifTask
 void playAIGif(void *parameter)
 {
     for (;;)
@@ -266,6 +274,7 @@ void playAIGif(void *parameter)
     }
 }
 
+// Start the task to play an animated GIF asynchronously
 void startPlayAIGifAsync(void)
 {
     gif.open((uint8_t *)ANIMATED_AI_IMAGE, sizeof(ANIMATED_AI_IMAGE), GIFDraw);
@@ -277,6 +286,7 @@ void startPlayAIGifAsync(void)
     }
 }
 
+// Stop the task to play an animated GIF asynchronously
 void stopPlayAIGifAsync(void)
 {
     if (taskHandlePlayGif != NULL)
@@ -289,6 +299,22 @@ void stopPlayAIGifAsync(void)
     display[0].deActivate();
 }
 
+// Create the task to play an animated GIF asynchronously
+TaskHandle_t playAIGifTask()
+{
+    TaskHandle_t taskHandle = NULL;
+    xTaskCreate(
+        playAIGif,   // Task function
+        "playAIGif", // Name of task
+        2048,        // Stack size of task (adjust as needed)
+        NULL,        // Parameter of the task
+        1,           // Priority of the task
+        &taskHandle  // Task handle
+    );
+    return taskHandle;
+}
+
+// Play an animated GIF synchronously
 void playAnimatedGIFSync(uint8_t *image, size_t imageSize, int screenIndex)
 {
     if (verifyScreenIndex(screenIndex))
@@ -304,20 +330,6 @@ void playAnimatedGIFSync(uint8_t *image, size_t imageSize, int screenIndex)
         tft.endWrite();
         display[screenIndex].deActivate();
     }
-}
-
-TaskHandle_t playAIGifTask()
-{
-    TaskHandle_t taskHandle = NULL;
-    xTaskCreate(
-        playAIGif,   // Task function
-        "playAIGif", // Name of task
-        2048,        // Stack size of task (adjust as needed)
-        NULL,        // Parameter of the task
-        1,           // Priority of the task
-        &taskHandle  // Task handle
-    );
-    return taskHandle;
 }
 
 #ifdef USE_SD_CARD
@@ -368,6 +380,7 @@ bool initSDCard(void)
     return true;
 }
 
+// Read a PNG image stored on the SD card
 uint8_t *readPNGImageFromSDCard(const char *filename, size_t *imageSize)
 {
     DEBUG_PRINTLN("Reading PNG Image");
@@ -415,6 +428,7 @@ uint8_t *readPNGImageFromSDCard(const char *filename, size_t *imageSize)
     return buffer;
 }
 
+// Read the file ID to use on the SD card, for naming the next image to be stored on the SD Card
 int readNextId(fs::FS &fs)
 {
     DEBUG_PRINTLN("Reading next ID");
@@ -436,6 +450,7 @@ int readNextId(fs::FS &fs)
     return fileContent.toInt(); // Convert string to integer and return
 }
 
+// Write the ID on the SD card to be used for naming the next image to be stored on the SD card
 void writeNextId(fs::FS &fs, int id)
 {
     DEBUG_PRINTLN("Writing next ID");
@@ -455,6 +470,7 @@ void writeNextId(fs::FS &fs, int id)
     DEBUG_PRINTLN("ID written successfully");
 }
 
+// Store a PNG file on the SD card
 void writeImage(fs::FS &fs, const char *path, uint8_t *image, size_t length)
 {
     DEBUG_PRINTF("Writing file: %s\n", path);
@@ -476,12 +492,13 @@ void writeImage(fs::FS &fs, const char *path, uint8_t *image, size_t length)
     file.close();
 }
 
+// Create a folder on the SD card, 
 void createDir(fs::FS &fs, const char *path)
 {
     DEBUG_PRINTF("Creating Dir: %s\n", path);
     if (fs.mkdir(path))
     {
-        DEBUG_PRINTLN("Dir created");
+        DEBUG_PRINTLN("Dir created"); // if the folder already exist it reports that it was created without touching it
     }
     else
     {
@@ -489,6 +506,7 @@ void createDir(fs::FS &fs, const char *path)
     }
 }
 
+// Count the number of files in a folder
 unsigned int countFilesInDirectory(const char *dirPath)
 {
     unsigned int fileCount = 0;
@@ -522,6 +540,7 @@ unsigned int countFilesInDirectory(const char *dirPath)
 }
 #endif
 
+// CPU Task to read the momentary switch asynchronously
 void generationSwitchTask(void *parameter)
 {
     for (;;)
@@ -542,9 +561,10 @@ void generationSwitchTask(void *parameter)
     }
 }
 
+// Start the generation of images to show on the screens
 void generateAIImages(void)
 {
-#ifdef SIMULATE_CALL_DALLE
+#ifdef SIMULATE_CALL_DALLE // Test images are used instead of calling the DALLE API
     startPlayAIGifAsync();
     unsigned long t = millis();
     while (millis() - t < 5000)
@@ -557,20 +577,21 @@ void generateAIImages(void)
     display[0].storeImage(decodedBase64Data, length);
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
-#else
+#else // Calling the DALLE API to generate images using prompts
     size_t length = generateDalleImageRandomPrompt();
     display[0].storeImage(decodedBase64Data, length);
-#ifdef USE_SD_CARD
+#ifdef USE_SD_CARD // IF a SD card module is used, the image is stored on the SD card
     String filename = String(IMAGES_FOLDER_NAME) + "/" + String(idForNewFile) + ".png";
     idForNewFile += 1;
     writeImage(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
 #endif
-    delay(5000);
-    shifImagesOnDisplayLeft();
+    delay(5000); // You can safely remove this delay
+    shifImagesOnDisplayLeft(); 
 #endif
 }
 
+// Shift all images to the left on the screens to make place for the next image
 void shifImagesOnDisplayLeft(void)
 {
     for (int i = NUM_DISPLAYS - 1; i >= 0; i--)
@@ -584,6 +605,7 @@ void shifImagesOnDisplayLeft(void)
     }
 }
 
+// Shift all images to the right on the screens to make place for the next image
 void shifImagesOnDisplayRight(void)
 {
     for (int i = 0; i < NUM_DISPLAYS; i++)
@@ -597,6 +619,7 @@ void shifImagesOnDisplayRight(void)
     }
 }
 
+// Switch images between screens, the image shown on sourceDisplay is copied to destinationDisplay
 void switchImageOnDisplay(int sourceDisplay, int destinationDisplay)
 {
     if (sourceDisplay == destinationDisplay)
@@ -626,6 +649,7 @@ void switchImageOnDisplay(int sourceDisplay, int destinationDisplay)
     }
 }
 
+// Verify screen index, should be 0 to NUM_DISPLAYS-1
 bool verifyScreenIndex(int screenIndex)
 {
     if (screenIndex < 0 || screenIndex >= NUM_DISPLAYS)
@@ -636,6 +660,7 @@ bool verifyScreenIndex(int screenIndex)
     return true;
 }
 
+// Initialization of all the displays including buffer space to store the image currently shown
 bool initDisplayPinsAndStorage(void)
 {
     tft.init();
@@ -659,6 +684,7 @@ bool initDisplayPinsAndStorage(void)
     return true;
 }
 
+// Play the "Rready" animated GIF on each screen in sequence
 void playReadyOnScreens(void)
 {
     for (int i = 0; i < NUM_DISPLAYS; i++)
@@ -670,12 +696,14 @@ void playReadyOnScreens(void)
     }
 }
 
+// Return a random PNG image generated by DALLE encoded in base64 
 size_t generateDalleImageRandomPrompt(void)
 {
     char *randomPrompt = prompts[myRandom(promptsCount)];
     return genereteDalleImage(randomPrompt);
 }
 
+// Call DALLE to generate an image using a prompte
 size_t genereteDalleImage(char *prompt)
 {
     callOpenAIAPIDalle(&base64Data, prompt);
@@ -684,6 +712,8 @@ size_t genereteDalleImage(char *prompt)
     return length;
 }
 
+// Call the DALLE API to generate an image using a prompt
+// readBuffer will contain the generated image encoded in base64
 void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
 {
     startPlayAIGifAsync();
@@ -788,6 +818,7 @@ void callOpenAIAPIDalle(String *readBuffer, const char *prompt)
     stopPlayAIGifAsync();
 }
 
+// Display a PNG image (decoded) on a specific screen (screenIndex)
 void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int screenIndex)
 {
     if (verifyScreenIndex(screenIndex))
@@ -812,8 +843,6 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
 
             tft.endWrite();
             display[screenIndex].deActivate();
-
-            // png.close(); // not needed for memory->memory decode
         }
         else
         {
@@ -822,7 +851,7 @@ void displayPngFromRam(const unsigned char *pngImageinC, size_t length, int scre
     }
 }
 
-// Memory allocation in PSRAM
+// Allocate memory in PSRAM
 bool allocatePsramMemory(void)
 {
     if (psramFound())
@@ -851,6 +880,7 @@ bool allocatePsramMemory(void)
     return true;
 }
 
+// Create the CPU task to read the momentary switch asynchronously
 void createTaskCore(void)
 {
     /* Core where the task should run */
@@ -913,6 +943,7 @@ void printPngError(int errorCode)
     }
 }
 
+// Display a PNG image (encoded) on a specific screen (screenIndex)
 size_t displayPngImage(const char *imageBase64Png, int displayIndex)
 {
     size_t length = base64::decodeLength(imageBase64Png);
@@ -925,6 +956,7 @@ size_t displayPngImage(const char *imageBase64Png, int displayIndex)
     return length;
 }
 
+// Generate a random numbre using the ESP32 random number generator from 0 to howbig-1
 long myRandom(long howbig)
 {
     if (howbig == 0)
@@ -934,6 +966,7 @@ long myRandom(long howbig)
     return esp_random() % howbig;
 }
 
+// Generate a random numbre using the ESP32 random number generator from howsmall to howbig-1
 long myRandom(long howsmall, long howbig)
 {
     if (howsmall >= howbig)
@@ -944,6 +977,7 @@ long myRandom(long howsmall, long howbig)
     return esp_random() % diff + howsmall;
 }
 
+// Connect to the Wifi network
 void connectToWifiNetwork()
 {
     WiFi.mode(WIFI_STA);
