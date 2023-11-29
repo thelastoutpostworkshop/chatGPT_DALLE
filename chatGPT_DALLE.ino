@@ -65,6 +65,7 @@ int currentSDCardFileIndex = 1;
 const char *ID_FILENAME = "id.txt";
 const char *IMAGES_FOLDER_NAME = "/images";
 int idForNewFile = 1;
+unsigned int nbfOfimagesOnSdCard = -1;
 #endif
 
 #define ANIMATED_AI_IMAGE ai
@@ -166,7 +167,14 @@ void loop()
     }
     else
     {
-        readRotaryEncoder();
+        if (nbfOfimagesOnSdCard > NUM_DISPLAYS - 1)
+        {
+            readRotaryEncoder();
+        }
+        else
+        {
+            Serial.printf("Not enough images on SD Card = %u\n", nbfOfimagesOnSdCard);
+        }
     }
 }
 
@@ -372,6 +380,7 @@ bool initSDCard(void)
 
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     DEBUG_PRINTF("SD Card Size: %lluMB\n", cardSize);
+    nbfOfimagesOnSdCard = countFilesInDirectory(IMAGES_FOLDER_NAME);
     return true;
 }
 
@@ -496,43 +505,36 @@ void createDir(fs::FS &fs, const char *path)
     }
 }
 
-void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
+unsigned int countFilesInDirectory(const char *dirPath)
 {
-    Serial.printf("Listing directory: %s\n", dirname);
+    unsigned int fileCount = 0;
 
-    File root = fs.open(dirname);
-    if (!root)
+    File dir = SD.open(dirPath);
+    if (!dir)
     {
         Serial.println("Failed to open directory");
-        return;
+        return 0;
     }
-    if (!root.isDirectory())
+    if (!dir.isDirectory())
     {
         Serial.println("Not a directory");
-        return;
+        return 0;
     }
 
-    File file = root.openNextFile();
+    File file = dir.openNextFile();
     while (file)
     {
-        if (file.isDirectory())
+        if (!file.isDirectory())
         {
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
-            if (levels)
-            {
-                listDir(fs, file.path(), levels - 1);
-            }
+            fileCount++; // Count only files, not sub-directories
         }
-        else
-        {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("  SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
+        file.close();
+        file = dir.openNextFile();
     }
+
+    dir.close();
+    DEBUG_PRINTF("Number of images on SD card=%u\n",fileCount);
+    return fileCount;
 }
 #endif
 
