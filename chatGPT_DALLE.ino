@@ -149,7 +149,7 @@ void setup()
     currentSDCardFileIndex = idForNewFile;
 #endif
     createTaskCore();
-    delay(5000); // You can safely remove this delay
+    // delay(5000); // You can safely remove this delay
     playReadyOnScreens();
 }
 
@@ -184,11 +184,11 @@ void readRotaryEncoder(void)
         if (currentSDCardFileIndex != 0)
         {
             shifImagesOnDisplayRight();
-            displayPngFileFromSDCard(currentSDCardFileIndex, NUM_DISPLAYS-1);
+            displayPngFileFromSDCard(currentSDCardFileIndex, NUM_DISPLAYS - 1);
         }
         else
         {
-            DEBUG_PRINTLN("No Previous Files");
+            DEBUG_PRINTLN("No Next Files");
             currentSDCardFileIndex = idForNewFile;
         }
     }
@@ -226,12 +226,12 @@ int findPreviousFileIndexOnSDCard(int fileIndex)
         }
     }
 
-    return 0; // No more previous files
+    return idForNewFile; // Cycle back
 }
 int findNextFileIndexOnSDCard(int fileIndex)
 {
     fileIndex += 1;
-    while (fileIndex >= idForNewFile)
+    while (fileIndex < idForNewFile)
     {
         String filename = String(IMAGES_FOLDER_NAME) + "/" + String(fileIndex) + ".png";
         if (!SD.exists(filename))
@@ -244,7 +244,7 @@ int findNextFileIndexOnSDCard(int fileIndex)
         }
     }
 
-    return 0; // No more previous files
+    return 1; // // Cycle back
 }
 
 void displayPngFileFromSDCard(int fileIndex, int screenIndex)
@@ -602,11 +602,8 @@ void shifImagesOnDisplayRight(void)
 {
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
-        int nextDisplay = i + 1;
-        if (nextDisplay < NUM_DISPLAYS)
-        {
-            switchImageOnDisplay(i, nextDisplay);
-        }
+        int displaySource = i - 1;
+        switchImageOnDisplay(i, displaySource);
     }
 }
 
