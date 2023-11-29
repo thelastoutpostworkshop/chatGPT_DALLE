@@ -610,6 +610,7 @@ void switchImageOnDisplay(int sourceDisplay, int destinationDisplay)
     {
         if (display[sourceDisplay].imageSize() > 0)
         {
+            display[destinationDisplay].fileIndex = display[sourceDisplay].fileIndex;
             display[destinationDisplay].storeImage(display[sourceDisplay].image(), display[sourceDisplay].imageSize());
             displayPngFromRam(display[destinationDisplay].image(), display[destinationDisplay].imageSize(), destinationDisplay);
             display[sourceDisplay].activate();
