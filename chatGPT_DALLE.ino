@@ -705,6 +705,7 @@ size_t generateDalleImageRandomPrompt(void)
 size_t genereteDalleImage(char *prompt)
 {
     display[0].activate();
+    tft.setTextColor(TFT_WHITE);
     tft.setCursor(10,10);
     tft.print(prompt);
     display[0].deActivate();
