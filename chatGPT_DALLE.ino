@@ -259,7 +259,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
         if (image != NULL)
         {
             displayPngFromRam(image, imageSize, 0);
-            display[0].storeImage((uint8_t *)image, imageSize);
+            display[screenIndex].storeImage((uint8_t *)image, imageSize);
             delete image; // delete buffer for image
         }
     }
