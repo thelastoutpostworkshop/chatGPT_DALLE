@@ -149,7 +149,7 @@ void setup()
     currentSDCardFileIndex = idForNewFile;
     DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
     createDir(SD, IMAGES_FOLDER_NAME);
-    currentSDCardFileIndex = idForNewFile;
+    currentSDCardFileIndex = 1;
 #endif
     createTaskCore();
     // delay(5000); // You can safely remove this delay
