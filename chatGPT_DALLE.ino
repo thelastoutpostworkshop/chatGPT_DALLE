@@ -161,10 +161,10 @@ void loop()
     if (runImageGeneration)
     {
         generateAIImages();
-        if (!runImageGeneration)
-        {
-            playReadyOnScreens();
-        }
+        // if (!runImageGeneration)
+        // {
+        //     playReadyOnScreens();
+        // }
     }
 #ifdef USE_ROTARY_ENCODER
     else
