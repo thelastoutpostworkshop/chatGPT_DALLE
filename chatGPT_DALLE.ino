@@ -226,7 +226,7 @@ int findPreviousFileIndexOnSDCard(int fileIndex)
         }
     }
 
-    return idForNewFile; // Cycle back
+    return findPreviousFileIndexOnSDCard(idForNewFile); // Cycle back
 }
 int findNextFileIndexOnSDCard(int fileIndex)
 {
@@ -244,7 +244,7 @@ int findNextFileIndexOnSDCard(int fileIndex)
         }
     }
 
-    return 1; // // Cycle back
+    return findNextFileIndexOnSDCard(0); // Cycle back
 }
 
 void displayPngFileFromSDCard(int fileIndex, int screenIndex)
