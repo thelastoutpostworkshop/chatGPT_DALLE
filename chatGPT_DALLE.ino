@@ -605,6 +605,10 @@ void shifImagesOnDisplayRight(void)
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
         int displaySource = i - 1;
+        if (i == NUM_DISPLAYS)
+        {
+            return;
+        }
         switchImageOnDisplay(i, displaySource);
     }
 }
