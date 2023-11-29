@@ -226,7 +226,7 @@ int findPreviousFileIndexOnSDCard(int fileIndex)
         }
     }
 
-    return idForNewFile-1; // Cycle back
+    return idForNewFile; // Cycle back
 }
 int findNextFileIndexOnSDCard(int fileIndex)
 {
