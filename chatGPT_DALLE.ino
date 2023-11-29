@@ -258,7 +258,7 @@ void displayPngFileFromSDCard(int fileIndex, int screenIndex)
         image = readPNGImageFromSDCard(filename.c_str(), &imageSize);
         if (image != NULL)
         {
-            displayPngFromRam(image, imageSize, 0);
+            displayPngFromRam(image, imageSize, screenIndex);
             display[screenIndex].storeImage((uint8_t *)image, imageSize);
             delete image; // delete buffer for image
         }
