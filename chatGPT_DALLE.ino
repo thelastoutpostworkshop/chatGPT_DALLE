@@ -710,6 +710,7 @@ size_t generateDalleImageRandomPrompt(void)
 size_t genereteDalleImage(char *prompt)
 {
     display[0].activate();
+    tft.fillScreen(TFT_BLACK);
     tft.setViewport(50, 60, 150, 170, false);
     tft.setTextColor(TFT_WHITE);
     tft.setCursor(30, 100);
