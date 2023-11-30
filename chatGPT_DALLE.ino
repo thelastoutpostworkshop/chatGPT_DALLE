@@ -127,21 +127,6 @@ void setup()
     }
     gif.begin(BIG_ENDIAN_PIXELS);
 
-    // Test
-    display[0].activate();
-    tft.setTextColor(TFT_WHITE);
-    tft.setCursor(10, 50);
-    tft.print(prompts[0]);
-    display[0].deActivate();
-    // playAnimatedGIFSync((uint8_t *)ANIMATED_AI_IMAGE, sizeof(ANIMATED_AI_IMAGE), 0);
-
-    while (true)
-    {
-        /* code */
-    }
-
-    // entest
-
     if (!allocatePsramMemory())
     {
         Serial.println("!!! Code Execution stopped!");
@@ -720,9 +705,11 @@ size_t generateDalleImageRandomPrompt(void)
 size_t genereteDalleImage(char *prompt)
 {
     display[0].activate();
+    tft.setViewport(50,60,150,170,false);
     tft.setTextColor(TFT_WHITE);
-    tft.setCursor(10, 10);
+    tft.setCursor(30, 100);
     tft.print(prompt);
+    tft.resetViewport();
     display[0].deActivate();
     callOpenAIAPIDalle(&base64Data, prompt);
     size_t length = displayPngImage(base64Data.c_str(), 0);
