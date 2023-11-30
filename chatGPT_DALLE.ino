@@ -682,7 +682,7 @@ bool initDisplayPinsAndStorage(void)
     return true;
 }
 
-// Play the "Rready" animated GIF on each screen in sequence
+// Play the "Ready" animated GIF on each screen in sequence
 void playReadyOnScreens(void)
 {
     for (int i = 0; i < NUM_DISPLAYS; i++)
