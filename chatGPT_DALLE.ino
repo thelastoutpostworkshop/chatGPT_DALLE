@@ -706,7 +706,7 @@ size_t generateDalleImageRandomPrompt(void)
     return genereteDalleImage(randomPrompt);
 }
 
-// Call DALLE to generate an image using a prompte
+// Call DALLE to generate an image using a prompt
 size_t genereteDalleImage(char *prompt)
 {
     display[0].activate();
