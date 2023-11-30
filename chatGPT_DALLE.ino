@@ -585,7 +585,10 @@ void generateAIImages(void)
     writeNextId(SD, idForNewFile);
 #endif
     delay(5000); // You can safely remove this delay
-    shifImagesOnDisplayLeft();
+    if (runImageGeneration)
+    {
+        shifImagesOnDisplayLeft();
+    }
 #endif
 }
 
@@ -705,7 +708,7 @@ size_t generateDalleImageRandomPrompt(void)
 size_t genereteDalleImage(char *prompt)
 {
     display[0].activate();
-    tft.setViewport(50,60,150,170,false);
+    tft.setViewport(50, 60, 150, 170, false);
     tft.setTextColor(TFT_WHITE);
     tft.setCursor(30, 100);
     tft.print(prompt);
