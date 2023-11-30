@@ -588,6 +588,8 @@ void generateAIImages(void)
     if (runImageGeneration)
     {
         shifImagesOnDisplayLeft();
+    } else {
+        Serial.println("Image generation stopped");
     }
 #endif
 }
