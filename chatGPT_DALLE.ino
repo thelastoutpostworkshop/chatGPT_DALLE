@@ -93,7 +93,7 @@ const int promptsCount = 10;
 char *prompts[promptsCount] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars vessel cockpit view in space",
                                "An empire spaceship attacking", "The interior of a spaceship", "Control Panels of an Alien spaceship",
                                "A futurisctic HUD screen", "A futuristic City", "A star wars vessel docked on a spaceport",
-                               "An Empire ship being repaired"};
+                               "A Star Trek LCARS"};
 
 int16_t xpos = 0;
 int16_t ypos = 0;
