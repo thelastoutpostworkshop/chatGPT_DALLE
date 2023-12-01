@@ -17,9 +17,9 @@
 #include "arduino_base64.hpp"
 #include "display.h"
 #include "switch.h"
-#include "images\ai.h"       // AI Animated GIF
-#include "images\readyPng.h" // Ready PNG
-#include "images\readyAnimation.h"
+#include "images\ai.h"              // AI Animated GIF
+#include "images\readyPng.h"        // Ready PNG
+#include "images\readyAnimation.h"  // Ready Animated GIF
 
 // #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
