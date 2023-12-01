@@ -26,9 +26,6 @@
 
 #ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
-#endif
-
-#ifdef USE_SD_CARD
 #define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
 #endif
 
