@@ -88,11 +88,11 @@ const char *startToken = "\"b64_json\": \"";
 const char *endToken = "\"";
 
 // Prompts
-const int promptsCount = 10;
-char *prompts[promptsCount] = {"An alien planet with ships orbiting", "A star wars spaceship", "A star wars vessel cockpit view in space",
-                               "An empire spaceship attacking", "The interior of a spaceship", "Control Panels of an Alien spaceship",
-                               "A futurisctic HUD screen", "A futuristic City", "A star wars vessel docked on a spaceport",
-                               "A Star Trek LCARS"};
+const int promptsCount = 11;
+char *prompts[promptsCount] = {"An Alien Planet with Ships Orbiting", "A Star Wars Spaceship", "A Star Wars Vessel Cockpit View in Space",
+                               "A Star Wars Empire Spaceship Attacking", "The Interior of a Spaceship", "Control Panels of an Alien Spaceship",
+                               "A Futurisctic HUD Screen", "A Futuristic City", "An Alien World",
+                               "A Star Trek LCARS Interface","Battle in Space between Spaceships"};
 
 enum imageGenerationMode
 {
