@@ -280,7 +280,6 @@ void startPlayAIGifAsync(void)
     gif.open((uint8_t *)ANIMATED_AI_IMAGE, sizeof(ANIMATED_AI_IMAGE), GIFDraw);
     display[0].activate();
     tft.startWrite();
-    tft.fillScreen(TFT_BLACK);
     if (taskHandlePlayGif == NULL)
     {
         taskHandlePlayGif = playAIGifTask();
@@ -568,6 +567,7 @@ void generateAIImages(imageGenerationMode mode)
 #ifdef SIMULATE_CALL_DALLE
     // Test images are used instead of calling the DALLE API
     display[0].activate();
+    tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_WHITE);
     printTextWithWordWrap("Generating test image", 70, 70, 100);
     display[0].deActivate();
