@@ -280,6 +280,7 @@ void startPlayAIGifAsync(void)
     gif.open((uint8_t *)ANIMATED_AI_IMAGE, sizeof(ANIMATED_AI_IMAGE), GIFDraw);
     display[0].activate();
     tft.startWrite();
+    tft.fillScreen(TFT_BLACK);
     if (taskHandlePlayGif == NULL)
     {
         taskHandlePlayGif = playAIGifTask();
