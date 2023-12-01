@@ -580,8 +580,11 @@ void generateAIImages(imageGenerationMode mode)
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
-    delay(5000); // Delay for simulation
-    shifImagesOnDisplayLeft();
+    delay(5000); 
+    if (runImageGeneration)
+    {
+        shifImagesOnDisplayLeft();
+    }
 #else
     // Calling the DALLE API to generate images using prompts
     size_t length;
