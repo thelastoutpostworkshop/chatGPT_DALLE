@@ -59,7 +59,6 @@ const int testImagesCount = 4;
 #define ROTARY_PIN_B 42
 #define ROTARY_PUSH_BUTTON 42
 SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);
-int currentSDCardFileIndex = 1;
 #endif
 
 #ifdef USE_SD_CARD
@@ -146,10 +145,8 @@ void setup()
         }
     }
     idForNewFile = readNextId(SD) + 1;
-    currentSDCardFileIndex = idForNewFile;
     DEBUG_PRINTF("ID for the next file is %d\n", idForNewFile);
     createDir(SD, IMAGES_FOLDER_NAME);
-    currentSDCardFileIndex = 1;
 #endif
     createTaskCore();
     // delay(5000); // You can safely remove this delay
@@ -181,22 +178,23 @@ void loop()
 void readRotaryEncoder(void)
 {
     byte i;
+    int fileIndex;
     i = rotary.rotate();
 
     if (i == 1)
     {
         DEBUG_PRINTLN("Clockwise");
-        currentSDCardFileIndex = findPreviousFileIndexOnSDCard(display[NUM_DISPLAYS - 1].fileIndex);
+        fileIndex = findPreviousFileIndexOnSDCard(display[NUM_DISPLAYS - 1].fileIndex);
         shifImagesOnDisplayRight();
-        displayPngFileFromSDCard(currentSDCardFileIndex, NUM_DISPLAYS - 1);
+        displayPngFileFromSDCard(fileIndex, NUM_DISPLAYS - 1);
     }
 
     if (i == 2)
     {
         DEBUG_PRINTLN("Counter Clockwise");
-        currentSDCardFileIndex = findNextFileIndexOnSDCard(display[0].fileIndex);
+        fileIndex = findNextFileIndexOnSDCard(display[0].fileIndex);
         shifImagesOnDisplayLeft();
-        displayPngFileFromSDCard(currentSDCardFileIndex, 0);
+        displayPngFileFromSDCard(fileIndex, 0);
     }
 }
 
@@ -674,6 +672,7 @@ bool initDisplayPinsAndStorage(void)
         tft.setRotation(2); // Adjust orientation as needed (0-3)
         tft.fillScreen(TFT_BLACK);
         display[i].deActivate();
+        display[i].fileIndex = i;
     }
     for (int i = 0; i < NUM_DISPLAYS; i++)
     {
@@ -711,7 +710,7 @@ size_t genereteDalleImage(char *prompt)
     tft.fillScreen(TFT_BLACK);
     tft.setViewport(60, 50, 130, 170, false);
     tft.setTextColor(TFT_WHITE);
-    tft.setCursor(0, 0);
+    tft.setCursor(60, 50);
     tft.print(prompt);
     tft.resetViewport();
     display[0].deActivate();
