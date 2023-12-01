@@ -902,6 +902,61 @@ void createTaskCore(void)
         1);                     /* Core where the task should run */
 }
 
+// Function to print text on the screen with word wrapping
+void printTextWithWordWrap(const String &text, int16_t x, int16_t y, uint16_t maxWidth)
+{
+  int16_t cursorX = x;
+  int16_t cursorY = y;
+  String currentLine = "";
+  String word = "";
+  char currentChar;
+
+  tft.setTextWrap(false); // Disable automatic text wrapping
+
+  for (int i = 0; i < text.length(); i++)
+  {
+    currentChar = text.charAt(i);
+
+    // Check for space or newline
+    if (currentChar == ' ' || currentChar == '\n')
+    {
+      if (tft.textWidth(currentLine + word) <= maxWidth)
+      {
+        currentLine += word + (currentChar == ' ' ? " " : "");
+        word = "";
+      }
+      else
+      {
+        tft.drawString(currentLine, cursorX, cursorY);
+        cursorY += tft.fontHeight();
+        currentLine = word + " ";
+        word = "";
+      }
+      if (currentChar == '\n')
+      {
+        tft.drawString(currentLine, cursorX, cursorY);
+        cursorY += tft.fontHeight();
+        currentLine = "";
+      }
+    }
+    else
+    {
+      word += currentChar;
+    }
+  }
+
+  if (tft.textWidth(currentLine + word) <= maxWidth)
+  {
+    tft.drawString(currentLine + word, cursorX, cursorY);
+  }
+  else
+  {
+    tft.drawString(currentLine, cursorX, cursorY);
+    cursorY += tft.fontHeight();
+    tft.drawString(word, cursorX, cursorY);
+  }
+}
+
 //=========================================v==========================================
 //                                      pngDraw
 //====================================================================================
