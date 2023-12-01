@@ -79,7 +79,7 @@ void GIFDraw(GIFDRAW *pDraw);
 SwitchReader generationSwitch(1);
 bool runImageGeneration = false; // Flag to indicate if generation of images is running or stopped
 
-#define MAX_IMAGE_WIDTH 240                       // Adjust for your images
+#define MAX_IMAGE_WIDTH 256                       
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
 #define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Length of buffer for reading the base64 encoded data in PSRAM
 #define BUFFER_RESPONSE_LENGTH 1024               // Length of buffer for reading api response in chunks
