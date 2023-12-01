@@ -25,12 +25,12 @@
 // #define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
-// #define USE_SD_CARD // Comment this line if you don't have an SD Card module
+#define USE_SD_CARD // Comment this line if you don't have an SD Card module
 #endif
 
 #ifdef USE_SD_CARD
 // The rotary encodre can be used only with the SD Card Module
-#define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
+// #define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
 #endif
 
 #ifdef DEBUG_ON
