@@ -30,7 +30,7 @@
 
 #ifdef USE_SD_CARD
 // The rotary encoder can be used only with the SD Card Module
-// #define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
+#define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
 #endif
 
 #ifdef DEBUG_ON
