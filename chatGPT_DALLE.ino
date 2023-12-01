@@ -21,7 +21,7 @@
 #include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
-// #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
+#define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
@@ -572,7 +572,6 @@ void generateAIImages(imageGenerationMode mode)
     {
     }
     stopPlayAIGifAsync();
-    // playAnimatedGIFSync((uint8_t*)transition,sizeof(transition));
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
