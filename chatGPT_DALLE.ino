@@ -92,7 +92,7 @@ const int promptsCount = 11;
 char *prompts[promptsCount] = {"An Alien Planet with Ships Orbiting", "A Star Wars Spaceship", "A Star Wars Vessel Cockpit View in Space",
                                "A Star Wars Empire Spaceship Attacking", "The Interior of a Spaceship", "Control Panels of an Alien Spaceship",
                                "A Futurisctic HUD Screen", "A Futuristic City", "An Alien World",
-                               "A Star Trek LCARS Interface","Battle in Space between Spaceships"};
+                               "A Star Trek LCARS Interface", "Battle in Space between Spaceships"};
 
 enum imageGenerationMode
 {
@@ -567,6 +567,10 @@ void generateAIImages(imageGenerationMode mode)
 {
 #ifdef SIMULATE_CALL_DALLE
     // Test images are used instead of calling the DALLE API
+    display[0].activate();
+    tft.setTextColor(TFT_WHITE);
+    printTextWithWordWrap("Generating test image", 70, 70, 100);
+    display[0].deActivate();
     startPlayAIGifAsync();
     unsigned long t = millis();
     while (millis() - t < 5000)
