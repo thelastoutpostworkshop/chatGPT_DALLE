@@ -556,7 +556,8 @@ void generationSwitchTask(void *parameter)
 // Generate an image on a screen
 void generateAIImages(void)
 {
-#ifdef SIMULATE_CALL_DALLE // Test images are used instead of calling the DALLE API
+#ifdef SIMULATE_CALL_DALLE
+    // Test images are used instead of calling the DALLE API
     startPlayAIGifAsync();
     unsigned long t = millis();
     while (millis() - t < 5000)
@@ -569,7 +570,8 @@ void generateAIImages(void)
     display[0].storeImage(decodedBase64Data, length);
     delay(5000); // Delay for simulation
     shifImagesOnDisplayLeft();
-#else              // Calling the DALLE API to generate images using prompts
+#else
+    // Calling the DALLE API to generate images using prompts
     size_t length = generateDalleImageRandomPrompt();
     display[0].storeImage(decodedBase64Data, length);
 #ifdef USE_SD_CARD // IF a SD card module is used, the image is stored on the SD card
