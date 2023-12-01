@@ -708,11 +708,8 @@ size_t genereteDalleImage(char *prompt)
 {
     display[0].activate();
     tft.fillScreen(TFT_BLACK);
-    tft.setViewport(60, 50, 130, 170, false);
     tft.setTextColor(TFT_WHITE);
-    tft.setCursor(60, 50);
-    tft.print(prompt);
-    tft.resetViewport();
+    printTextWithWordWrap(prompt, 70, 70, 100);
     display[0].deActivate();
     callOpenAIAPIDalle(&base64Data, prompt);
     size_t length = displayPngImage(base64Data.c_str(), 0);
@@ -905,56 +902,56 @@ void createTaskCore(void)
 // Function to print text on the screen with word wrapping
 void printTextWithWordWrap(const String &text, int16_t x, int16_t y, uint16_t maxWidth)
 {
-  int16_t cursorX = x;
-  int16_t cursorY = y;
-  String currentLine = "";
-  String word = "";
-  char currentChar;
+    int16_t cursorX = x;
+    int16_t cursorY = y;
+    String currentLine = "";
+    String word = "";
+    char currentChar;
 
-  tft.setTextWrap(false); // Disable automatic text wrapping
+    tft.setTextWrap(false); // Disable automatic text wrapping
 
-  for (int i = 0; i < text.length(); i++)
-  {
-    currentChar = text.charAt(i);
-
-    // Check for space or newline
-    if (currentChar == ' ' || currentChar == '\n')
+    for (int i = 0; i < text.length(); i++)
     {
-      if (tft.textWidth(currentLine + word) <= maxWidth)
-      {
-        currentLine += word + (currentChar == ' ' ? " " : "");
-        word = "";
-      }
-      else
-      {
-        tft.drawString(currentLine, cursorX, cursorY);
-        cursorY += tft.fontHeight();
-        currentLine = word + " ";
-        word = "";
-      }
-      if (currentChar == '\n')
-      {
-        tft.drawString(currentLine, cursorX, cursorY);
-        cursorY += tft.fontHeight();
-        currentLine = "";
-      }
+        currentChar = text.charAt(i);
+
+        // Check for space or newline
+        if (currentChar == ' ' || currentChar == '\n')
+        {
+            if (tft.textWidth(currentLine + word) <= maxWidth)
+            {
+                currentLine += word + (currentChar == ' ' ? " " : "");
+                word = "";
+            }
+            else
+            {
+                tft.drawString(currentLine, cursorX, cursorY);
+                cursorY += tft.fontHeight();
+                currentLine = word + " ";
+                word = "";
+            }
+            if (currentChar == '\n')
+            {
+                tft.drawString(currentLine, cursorX, cursorY);
+                cursorY += tft.fontHeight();
+                currentLine = "";
+            }
+        }
+        else
+        {
+            word += currentChar;
+        }
+    }
+
+    if (tft.textWidth(currentLine + word) <= maxWidth)
+    {
+        tft.drawString(currentLine + word, cursorX, cursorY);
     }
     else
     {
-      word += currentChar;
+        tft.drawString(currentLine, cursorX, cursorY);
+        cursorY += tft.fontHeight();
+        tft.drawString(word, cursorX, cursorY);
     }
-  }
-
-  if (tft.textWidth(currentLine + word) <= maxWidth)
-  {
-    tft.drawString(currentLine + word, cursorX, cursorY);
-  }
-  else
-  {
-    tft.drawString(currentLine, cursorX, cursorY);
-    cursorY += tft.fontHeight();
-    tft.drawString(word, cursorX, cursorY);
-  }
 }
 
 //=========================================v==========================================
