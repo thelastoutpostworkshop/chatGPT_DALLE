@@ -22,7 +22,7 @@
 #include "images\readyAnimation.h"
 
 // #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+#define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -79,7 +79,7 @@ void GIFDraw(GIFDRAW *pDraw);
 SwitchReader generationSwitch(1);
 bool runImageGeneration = false; // Flag to indicate if generation of images is running or stopped
 
-#define MAX_IMAGE_WIDTH 1024                       
+#define MAX_IMAGE_WIDTH 1024
 #define PSRAM_BUFFER_DECODED_LENGTH 4000000L      // Length of buffer for base64 data decoding in PSRAM
 #define PSRAM_BUFFER_READ_ENCODED_LENGTH 2000000L // Length of buffer for reading the base64 encoded data in PSRAM
 #define BUFFER_RESPONSE_LENGTH 1024               // Length of buffer for reading api response in chunks
@@ -161,10 +161,6 @@ void loop()
     if (runImageGeneration)
     {
         generateAIImages();
-        // if (!runImageGeneration)
-        // {
-        //     playReadyOnScreens();
-        // }
     }
 #ifdef USE_ROTARY_ENCODER
     else
@@ -588,7 +584,9 @@ void generateAIImages(void)
     if (runImageGeneration)
     {
         shifImagesOnDisplayLeft();
-    } else {
+    }
+    else
+    {
         Serial.println("Image generation stopped");
     }
 #endif
