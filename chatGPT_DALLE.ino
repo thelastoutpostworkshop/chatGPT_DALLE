@@ -580,11 +580,6 @@ void generateAIImages(imageGenerationMode mode)
     const char *image = testPngImages[myRandom(testImagesCount)];
     size_t length = displayPngImage(image, 0);
     display[0].storeImage(decodedBase64Data, length);
-    delay(5000); 
-    if (runImageGeneration)
-    {
-        shifImagesOnDisplayLeft();
-    }
 #else
     // Calling the DALLE API to generate images using prompts
     size_t length;
@@ -611,6 +606,7 @@ void generateAIImages(imageGenerationMode mode)
     writeImage(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
 #endif
+#endif
     delay(5000);
     if (runImageGeneration)
     {
@@ -620,7 +616,6 @@ void generateAIImages(imageGenerationMode mode)
     {
         Serial.println("Image generation stopped");
     }
-#endif
 }
 
 // Shift all images to the left on the screens to make place for the next image
