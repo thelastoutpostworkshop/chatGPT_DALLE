@@ -21,11 +21,15 @@
 #include "images\readyPng.h" // Ready PNG
 #include "images\readyAnimation.h"
 
-#define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
+// #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
 // #define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
-#define USE_SD_CARD // Comment this line if you don't have an SD Card module
+// #define USE_SD_CARD // Comment this line if you don't have an SD Card module
+#endif
+
+#ifdef USE_SD_CARD
+// The rotary encodre can be used only with the SD Card Module
 #define USE_ROTARY_ENCODER // Comment this line if you don't want to use the rotary encoder, it is used to navigate files on the SD card module
 #endif
 
