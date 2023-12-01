@@ -578,7 +578,7 @@ void generateAIImages(void)
     writeImage(SD, filename.c_str(), decodedBase64Data, length);
     writeNextId(SD, idForNewFile);
 #endif
-    delay(5000); // You can safely remove this delay
+    delay(5000);
     if (runImageGeneration)
     {
         shifImagesOnDisplayLeft();
