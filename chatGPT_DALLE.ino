@@ -58,7 +58,7 @@ const int testImagesCount = 4;
 #ifdef USE_ROTARY_ENCODER
 #define ROTARY_PIN_A 41
 #define ROTARY_PIN_B 42
-#define ROTARY_PUSH_BUTTON 42
+#define ROTARY_PUSH_BUTTON 42   // Not used 
 SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);
 #endif
 
