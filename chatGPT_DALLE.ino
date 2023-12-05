@@ -25,6 +25,8 @@
 #define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
+// The images folder and index file are created automatically, 
+// just make your SD card is 32GB Max and formatted as FAT32.  See this video that shows how to format it: https://youtu.be/Np0cbretbns?t=110
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
 #endif
 
