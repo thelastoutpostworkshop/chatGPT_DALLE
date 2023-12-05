@@ -4,7 +4,7 @@
 // The Micro SD Card Module (optional) is this one : https://amzn.to/46tSgvn
 // The Rotary Encoder (optional) is this one: https://amzn.to/3Cj7t61
 //
-// See the full tutorial here :
+// See the full tutorial here : https://youtu.be/zBzIBRsckTw
 
 #include <PNGdec.h>           // Install this library with the Arduino IDE Library Manager
 #include <TFT_eSPI.h>         // Install this library with the Arduino IDE Library Manager
@@ -22,7 +22,7 @@
 #include "images\readyAnimation.h" // Ready Animated GIF
 
 #define SIMULATE_CALL_DALLE // Test images will be used, uncomment this line to make the real call to the DALLE API
-#define DEBUG_ON // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
+#define DEBUG_ON            // Comment this line if you don't want detailed messages on the serial monitor, all errors will be printed
 
 #ifndef SIMULATE_CALL_DALLE
 #define USE_SD_CARD // Comment this line if you don't have an SD Card module
@@ -58,7 +58,7 @@ const int testImagesCount = 4;
 #ifdef USE_ROTARY_ENCODER
 #define ROTARY_PIN_A 41
 #define ROTARY_PIN_B 42
-#define ROTARY_PUSH_BUTTON 42   // Not used 
+#define ROTARY_PUSH_BUTTON 42 // Not used
 SimpleRotary rotary(ROTARY_PIN_A, ROTARY_PIN_B, ROTARY_PUSH_BUTTON);
 #endif
 
