@@ -4,4 +4,4 @@
 https://youtu.be/zBzIBRsckTw
 
 
-![Usage](https://github.com/thelastoutpostworkshop/chatGPT_DALLE/blob/main/images/AI%20Takes%20Control.png)
+![Usage](https://github.com/thelastoutpostworkshop/chatGPT_DALLE/blob/main/images/AI%20Takes%20Control_1.png)
