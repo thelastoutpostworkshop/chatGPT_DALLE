@@ -15,6 +15,8 @@
 #include <WiFiClientSecure.h> // Install this library with the Arduino IDE Library Manager
 #include "arduino_base64.hpp" // Install this library (base64_encode by dojyorin) with the Arduino IDE Library Manager
 
+#include <WiFi.h>
+
 #include "secrets.h"
 #include "display.h"
 #include "switch.h"
