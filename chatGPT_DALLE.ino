@@ -1,5 +1,12 @@
 // This project works on the ESP32-S3-N16R2 (8MB of PSRAM)
 // PSRAM is needed for this project.
+// Tested on :
+// PNGdec v1.0.3
+// TFT_eSPI  v2.5.43
+// AnimatedGIF v2.1.1
+// SimpleRotary v1.1.3
+// base64_encode v2.0.4
+//
 // The round display (https://amzn.to/3L4pud6) use the GC9A01 driver from the TFT_eSPI library
 // The Micro SD Card Module (optional) is this one : https://amzn.to/46tSgvn
 // The Rotary Encoder (optional) is this one: https://amzn.to/3Cj7t61
