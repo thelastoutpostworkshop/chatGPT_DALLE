@@ -1,6 +1,7 @@
 // This project works on the ESP32-S3-N16R2 (8MB of PSRAM)
 // PSRAM is needed for this project.
 // Tested on :
+// Arduino Espressif Core v3.1.1
 // PNGdec v1.0.3
 // TFT_eSPI  v2.5.43
 // AnimatedGIF v2.1.1
